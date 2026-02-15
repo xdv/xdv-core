@@ -3,6 +3,12 @@
 forge XdvCoreInitApp {
 
     const APP_ID: UInt32 = 2;
+
+    const STATUS_OK: UInt32 = 0;
+    const STATUS_INIT_FAILED: UInt32 = 1;
+    const STATUS_WAIT_FAILED: UInt32 = 2;
+    const STATUS_SIGNAL_FAILED: UInt32 = 3;
+
     const SIGNAL_SHUTDOWN: UInt32 = 15;
     const SIGNAL_RELOAD: UInt32 = 1;
 
@@ -13,40 +19,76 @@ forge XdvCoreInitApp {
 
     proc K::init_bootstrap() {
         emit "xdv-core.init: bootstrap";
-        init_fs();
-        init_scheduler();
-        init_console();
-        spawn_shell();
-        return 0;
+        let console_status = init_console();
+        if console_status == STATUS_OK {
+            let scheduler_status = init_scheduler();
+            if scheduler_status == STATUS_OK {
+                let fs_status = init_fs();
+                if fs_status == STATUS_OK {
+                    let shell_status = spawn_shell();
+                    if shell_status == STATUS_OK {
+                        return STATUS_OK;
+                    } else {
+                        return STATUS_INIT_FAILED;
+                    }
+                } else {
+                    return STATUS_INIT_FAILED;
+                }
+            } else {
+                return STATUS_INIT_FAILED;
+            }
+        } else {
+            return STATUS_INIT_FAILED;
+        }
     }
 
     proc K::init_spawn_shell() {
         emit "xdv-core.init: spawn shell";
-        spawn_shell();
-        return 0;
+        let status = spawn_shell();
+        if status == STATUS_OK {
+            return STATUS_OK;
+        } else {
+            return STATUS_INIT_FAILED;
+        }
     }
 
     proc K::init_wait(pid: UInt32) {
         emit "xdv-core.init: wait";
-        wait_for_child(pid);
-        return 0;
+        let status = wait_for_child(pid);
+        if status == STATUS_OK {
+            return STATUS_OK;
+        } else {
+            return STATUS_WAIT_FAILED;
+        }
     }
 
     proc K::init_reap() {
         emit "xdv-core.init: reap zombies";
-        reap_zombies();
-        return 0;
+        let status = reap_zombies();
+        if status == STATUS_OK {
+            return STATUS_OK;
+        } else {
+            return STATUS_INIT_FAILED;
+        }
     }
 
     proc K::init_shutdown() {
         emit "xdv-core.init: shutdown signal";
-        handle_signal(SIGNAL_SHUTDOWN);
-        return 0;
+        let status = handle_signal(SIGNAL_SHUTDOWN);
+        if status == STATUS_OK {
+            return STATUS_OK;
+        } else {
+            return STATUS_SIGNAL_FAILED;
+        }
     }
 
     proc K::init_reload() {
         emit "xdv-core.init: reload signal";
-        handle_signal(SIGNAL_RELOAD);
-        return 0;
+        let status = handle_signal(SIGNAL_RELOAD);
+        if status == STATUS_OK {
+            return STATUS_OK;
+        } else {
+            return STATUS_SIGNAL_FAILED;
+        }
     }
 }

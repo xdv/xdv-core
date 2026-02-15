@@ -3,8 +3,14 @@
 forge XdvCoreProcessApp {
 
     const APP_ID: UInt32 = 5;
+
+    const STATUS_OK: UInt32 = 0;
+    const STATUS_PROCESS_FAILED: UInt32 = 1;
+    const STATUS_INVALID_PID: UInt32 = 2;
+
     const DEFAULT_STACK_SIZE: UInt32 = 8192;
     const DEFAULT_EXIT_CODE: UInt32 = 0;
+    const INVALID_PID: UInt32 = 0;
 
     proc K::process_spawn(entry: UInt64) {
         emit "xdv-core.process: spawn";
@@ -18,12 +24,30 @@ forge XdvCoreProcessApp {
 
     proc K::process_join(pid: UInt32) {
         emit "xdv-core.process: join";
-        return join(pid);
+        if pid == INVALID_PID {
+            return STATUS_INVALID_PID;
+        } else {
+            let joined = join(pid);
+            if joined == INVALID_PID {
+                return STATUS_PROCESS_FAILED;
+            } else {
+                return joined;
+            }
+        }
     }
 
     proc K::process_kill(pid: UInt32) {
         emit "xdv-core.process: exit";
-        return exit(pid, DEFAULT_EXIT_CODE);
+        if pid == INVALID_PID {
+            return STATUS_INVALID_PID;
+        } else {
+            let status = exit(pid, DEFAULT_EXIT_CODE);
+            if status == DEFAULT_EXIT_CODE {
+                return STATUS_OK;
+            } else {
+                return status;
+            }
+        }
     }
 
     proc K::process_sleep(ms: UInt32) {
@@ -38,6 +62,11 @@ forge XdvCoreProcessApp {
 
     proc K::process_current_pid() {
         emit "xdv-core.process: current pid";
-        return getpid();
+        let pid = getpid();
+        if pid == INVALID_PID {
+            return STATUS_PROCESS_FAILED;
+        } else {
+            return pid;
+        }
     }
 }
