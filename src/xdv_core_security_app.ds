@@ -1,0 +1,47 @@
+// xdv-core: security and permission administration application
+
+forge XdvCoreSecurityApp {
+
+    const APP_ID: UInt32 = 12;
+    const MODE_LOCKDOWN: UInt16 = 384;
+    const MODE_STANDARD: UInt16 = 420;
+    const DEFAULT_UMASK: UInt16 = 18;
+
+    proc K::security_status() {
+        emit "xdv-core.security: status";
+        perm_default_umask();
+        process_current_pid();
+        return 0;
+    }
+
+    proc K::security_chmod(path: Str, mode: UInt16) {
+        emit "xdv-core.security: chmod";
+        perm_chmod(path, mode);
+        return 0;
+    }
+
+    proc K::security_chown(path: Str, user_id: UInt32) {
+        emit "xdv-core.security: chown";
+        perm_chown(path, user_id);
+        return 0;
+    }
+
+    proc K::security_chgrp(path: Str, group_id: UInt32) {
+        emit "xdv-core.security: chgrp";
+        perm_chgrp(path, group_id);
+        return 0;
+    }
+
+    proc K::security_lockdown(path: Str) {
+        emit "xdv-core.security: lockdown";
+        perm_chmod(path, MODE_LOCKDOWN);
+        return 0;
+    }
+
+    proc K::security_restore(path: Str) {
+        emit "xdv-core.security: restore";
+        perm_chmod(path, MODE_STANDARD);
+        perm_set_umask(DEFAULT_UMASK);
+        return 0;
+    }
+}

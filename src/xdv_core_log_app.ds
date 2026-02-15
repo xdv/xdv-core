@@ -1,0 +1,39 @@
+// xdv-core: logging administration application
+
+forge XdvCoreLogApp {
+
+    const APP_ID: UInt32 = 10;
+    const DEFAULT_LOG_READ: UInt32 = 1024;
+
+    proc K::log_status() {
+        emit "xdv-core.log: status";
+        console_status();
+        return 0;
+    }
+
+    proc K::log_open(path_ptr: UInt64) {
+        emit "xdv-core.log: open";
+        return io_open_append(path_ptr);
+    }
+
+    proc K::log_write(fd: UInt64, buffer_ptr: UInt64, size: UInt32) {
+        emit "xdv-core.log: write";
+        return io_write(fd, buffer_ptr, size);
+    }
+
+    proc K::log_read(fd: UInt64, buffer_ptr: UInt64) {
+        emit "xdv-core.log: read";
+        return io_read(fd, buffer_ptr, DEFAULT_LOG_READ);
+    }
+
+    proc K::log_close(fd: UInt64) {
+        emit "xdv-core.log: close";
+        return io_close(fd);
+    }
+
+    proc K::log_emit_console(msg_ptr: UInt64) {
+        emit "xdv-core.log: emit console";
+        console_write(msg_ptr);
+        return 0;
+    }
+}

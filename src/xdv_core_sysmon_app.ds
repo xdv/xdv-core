@@ -1,0 +1,39 @@
+// xdv-core: runtime and system telemetry application
+
+forge XdvCoreSysmonApp {
+
+    const APP_ID: UInt32 = 8;
+    const SAMPLE_BUFFER_SIZE: UInt32 = 256;
+
+    proc K::sysmon_snapshot() {
+        emit "xdv-core.sysmon: snapshot";
+        process_current_pid();
+        scheduler_status();
+        memory_diag();
+        probe_all();
+        return 0;
+    }
+
+    proc K::sysmon_runtime_health() {
+        emit "xdv-core.sysmon: runtime health";
+        init_status();
+        scheduler_tick();
+        process_yield();
+        return 0;
+    }
+
+    proc K::sysmon_io_sample(path_ptr: UInt64, buffer_ptr: UInt64) {
+        emit "xdv-core.sysmon: io sample";
+        io_open_read(path_ptr);
+        io_read(0, buffer_ptr, SAMPLE_BUFFER_SIZE);
+        io_close(0);
+        return 0;
+    }
+
+    proc K::sysmon_storage_sample(device: Str) {
+        emit "xdv-core.sysmon: storage sample";
+        lsblk();
+        space_iostat(device);
+        return 0;
+    }
+}

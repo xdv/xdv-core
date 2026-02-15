@@ -1,0 +1,35 @@
+// xdv-core: shared CLI orchestration entrypoints
+
+forge XdvCoreCli {
+
+    const PROFILE_MINIMUM: UInt32 = 1;
+    const PROFILE_ADMIN: UInt32 = 2;
+    const PROFILE_RECOVERY: UInt32 = 3;
+
+    proc K::run_minimum() {
+        emit "xdv-core.cli: run minimum";
+        run_runtime_minimum_set();
+        return 0;
+    }
+
+    proc K::run_admin() {
+        emit "xdv-core.cli: run admin";
+        run_system_admin_set();
+        return 0;
+    }
+
+    proc K::run_recovery(device: Str, mount_point: Str) {
+        emit "xdv-core.cli: run recovery";
+        recovery_diagnostics();
+        recovery_safe_mode(device, mount_point);
+        return 0;
+    }
+
+    proc K::run_all(device: Str, mount_point: Str) {
+        emit "xdv-core.cli: run all";
+        run_runtime_minimum_set();
+        run_system_admin_set();
+        recovery_repair(device, mount_point);
+        return 0;
+    }
+}

@@ -1,0 +1,64 @@
+// xdv-core: storage and filesystem administration application
+
+forge XdvCoreStorageApp {
+
+    const APP_ID: UInt32 = 11;
+    const SAFE_REPAIR_MODE: UInt32 = 1;
+    const DEFAULT_FILE_MODE: UInt16 = 420;
+
+    proc K::storage_status() {
+        emit "xdv-core.storage: status";
+        probe_all();
+        lsblk();
+        return 0;
+    }
+
+    proc K::storage_partition_print(device: Str) {
+        emit "xdv-core.storage: partition print";
+        fdisk_print(device);
+        return 0;
+    }
+
+    proc K::storage_mkfs(device: Str) {
+        emit "xdv-core.storage: mkfs";
+        mkfs_xdvfs(device);
+        return 0;
+    }
+
+    proc K::storage_fsck(device: Str) {
+        emit "xdv-core.storage: fsck";
+        fsck_xdvfs(device, SAFE_REPAIR_MODE);
+        return 0;
+    }
+
+    proc K::storage_mount(device: Str, mount_point: Str) {
+        emit "xdv-core.storage: mount";
+        mount_xdvfs(device, mount_point);
+        return 0;
+    }
+
+    proc K::storage_unmount(mount_point: Str) {
+        emit "xdv-core.storage: unmount";
+        mount_umount(mount_point);
+        return 0;
+    }
+
+    proc K::storage_df(device: Str, mount_point: Str) {
+        emit "xdv-core.storage: df";
+        space_df(device, mount_point);
+        return 0;
+    }
+
+    proc K::storage_dir_list(path: Str) {
+        emit "xdv-core.storage: dir list";
+        dir_ls(path, 0);
+        return 0;
+    }
+
+    proc K::storage_file_touch(path: Str) {
+        emit "xdv-core.storage: file touch";
+        file_touch(path);
+        perm_chmod(path, DEFAULT_FILE_MODE);
+        return 0;
+    }
+}

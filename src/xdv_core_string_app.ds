@@ -1,0 +1,41 @@
+// xdv-core: runtime string administration application
+
+forge XdvCoreStringApp {
+
+    const APP_ID: UInt32 = 7;
+
+    proc K::string_len(ptr: UInt64) {
+        emit "xdv-core.string: len";
+        return len(ptr);
+    }
+
+    proc K::string_concat(a: UInt64, b: UInt64) {
+        emit "xdv-core.string: concat";
+        return concat(a, b);
+    }
+
+    proc K::string_compare(a: UInt64, b: UInt64) {
+        emit "xdv-core.string: compare";
+        return compare(a, b);
+    }
+
+    proc K::string_find(haystack: UInt64, needle: UInt64) {
+        emit "xdv-core.string: find";
+        return find(haystack, needle);
+    }
+
+    proc K::string_substring(ptr: UInt64, start_idx: UInt32, end_idx: UInt32) {
+        emit "xdv-core.string: substring";
+        return substring(ptr, start_idx, end_idx);
+    }
+
+    proc K::string_to_upper(ptr: UInt64) {
+        emit "xdv-core.string: to upper";
+        return to_upper(ptr);
+    }
+
+    proc K::string_to_lower(ptr: UInt64) {
+        emit "xdv-core.string: to lower";
+        return to_lower(ptr);
+    }
+}

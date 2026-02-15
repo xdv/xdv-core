@@ -1,0 +1,51 @@
+// xdv-core: service and task control application
+
+forge XdvCoreServiceApp {
+
+    const APP_ID: UInt32 = 9;
+    const DEFAULT_STACK_SIZE: UInt32 = 8192;
+    const DEFAULT_PRIORITY: UInt32 = 5;
+
+    proc K::service_status() {
+        emit "xdv-core.service: status";
+        process_current_pid();
+        scheduler_status();
+        return 0;
+    }
+
+    proc K::service_start(entry: UInt64) {
+        emit "xdv-core.service: start";
+        process_spawn_with_stack(entry, DEFAULT_STACK_SIZE);
+        scheduler_add(1);
+        scheduler_set_priority(1, DEFAULT_PRIORITY);
+        return 0;
+    }
+
+    proc K::service_start_priority(entry: UInt64, priority: UInt32) {
+        emit "xdv-core.service: start priority";
+        process_spawn_with_stack(entry, DEFAULT_STACK_SIZE);
+        scheduler_add(1);
+        scheduler_set_priority(1, priority);
+        return 0;
+    }
+
+    proc K::service_stop(pid: UInt32) {
+        emit "xdv-core.service: stop";
+        scheduler_remove(pid);
+        process_kill(pid);
+        return 0;
+    }
+
+    proc K::service_restart(pid: UInt32, entry: UInt64) {
+        emit "xdv-core.service: restart";
+        service_stop(pid);
+        service_start(entry);
+        return 0;
+    }
+
+    proc K::service_reload() {
+        emit "xdv-core.service: reload";
+        init_reload();
+        return 0;
+    }
+}

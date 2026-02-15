@@ -1,0 +1,49 @@
+// xdv-core: console administration application
+
+forge XdvCoreConsoleApp {
+
+    const APP_ID: UInt32 = 1;
+    const DEFAULT_FG: UInt8 = 7;
+    const DEFAULT_BG: UInt8 = 0;
+
+    proc K::console_status() {
+        emit "xdv-core.console: status";
+        get_cursor_row();
+        get_cursor_col();
+        return 0;
+    }
+
+    proc K::console_clear() {
+        emit "xdv-core.console: clear";
+        clear();
+        return 0;
+    }
+
+    proc K::console_set_theme(fg: UInt8, bg: UInt8) {
+        emit "xdv-core.console: set theme";
+        set_color(fg, bg);
+        return 0;
+    }
+
+    proc K::console_reset_theme() {
+        console_set_theme(DEFAULT_FG, DEFAULT_BG);
+        return 0;
+    }
+
+    proc K::console_write(ptr: UInt64) {
+        emit "xdv-core.console: write";
+        puts(ptr);
+        return 0;
+    }
+
+    proc K::console_read_key() {
+        emit "xdv-core.console: read key";
+        return getchar();
+    }
+
+    proc K::console_move_cursor(row: UInt32, col: UInt32) {
+        emit "xdv-core.console: move cursor";
+        set_cursor(row, col);
+        return 0;
+    }
+}

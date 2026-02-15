@@ -1,0 +1,38 @@
+// xdv-core: diagnostics and recovery application
+
+forge XdvCoreRecoveryApp {
+
+    const APP_ID: UInt32 = 13;
+
+    proc K::recovery_diagnostics() {
+        emit "xdv-core.recovery: diagnostics";
+        sysmon_snapshot();
+        service_status();
+        storage_status();
+        security_status();
+        return 0;
+    }
+
+    proc K::recovery_safe_mode(device: Str, mount_point: Str) {
+        emit "xdv-core.recovery: safe mode";
+        console_clear();
+        mount_read_only(device, mount_point);
+        fsck_read_only(device);
+        return 0;
+    }
+
+    proc K::recovery_repair(device: Str, mount_point: Str) {
+        emit "xdv-core.recovery: repair";
+        fsck_auto_repair(device);
+        mount_check(device);
+        mount_xdvfs(device, mount_point);
+        return 0;
+    }
+
+    proc K::recovery_reload_runtime() {
+        emit "xdv-core.recovery: reload runtime";
+        init_reload();
+        scheduler_init_start();
+        return 0;
+    }
+}

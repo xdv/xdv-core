@@ -1,0 +1,39 @@
+// xdv-core: runtime I/O administration application
+
+forge XdvCoreIoApp {
+
+    const APP_ID: UInt32 = 3;
+    const MODE_READ: UInt32 = 0;
+    const MODE_WRITE: UInt32 = 1;
+    const MODE_APPEND: UInt32 = 2;
+
+    proc K::io_open_read(path_ptr: UInt64) {
+        emit "xdv-core.io: open read";
+        return open(path_ptr, MODE_READ);
+    }
+
+    proc K::io_open_write(path_ptr: UInt64) {
+        emit "xdv-core.io: open write";
+        return open(path_ptr, MODE_WRITE);
+    }
+
+    proc K::io_open_append(path_ptr: UInt64) {
+        emit "xdv-core.io: open append";
+        return open(path_ptr, MODE_APPEND);
+    }
+
+    proc K::io_read(fd: UInt64, buffer: UInt64, size: UInt32) {
+        emit "xdv-core.io: read";
+        return read(fd, buffer, size);
+    }
+
+    proc K::io_write(fd: UInt64, buffer: UInt64, size: UInt32) {
+        emit "xdv-core.io: write";
+        return write(fd, buffer, size);
+    }
+
+    proc K::io_close(fd: UInt64) {
+        emit "xdv-core.io: close";
+        return close(fd);
+    }
+}

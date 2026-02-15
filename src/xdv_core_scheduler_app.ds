@@ -1,0 +1,48 @@
+// xdv-core: runtime scheduler administration application
+
+forge XdvCoreSchedulerApp {
+
+    const APP_ID: UInt32 = 6;
+    const DEFAULT_PRIORITY: UInt32 = 5;
+
+    proc K::scheduler_status() {
+        emit "xdv-core.scheduler: status";
+        return get_current_task();
+    }
+
+    proc K::scheduler_init_start() {
+        emit "xdv-core.scheduler: init+start";
+        init();
+        start();
+        return 0;
+    }
+
+    proc K::scheduler_stop() {
+        emit "xdv-core.scheduler: stop";
+        stop();
+        return 0;
+    }
+
+    proc K::scheduler_add(pid: UInt32) {
+        emit "xdv-core.scheduler: add task";
+        add_task(pid, DEFAULT_PRIORITY);
+        return 0;
+    }
+
+    proc K::scheduler_remove(pid: UInt32) {
+        emit "xdv-core.scheduler: remove task";
+        remove_task(pid);
+        return 0;
+    }
+
+    proc K::scheduler_set_priority(pid: UInt32, priority: UInt32) {
+        emit "xdv-core.scheduler: set priority";
+        set_priority(pid, priority);
+        return 0;
+    }
+
+    proc K::scheduler_tick() {
+        emit "xdv-core.scheduler: schedule tick";
+        return schedule();
+    }
+}

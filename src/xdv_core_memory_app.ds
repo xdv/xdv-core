@@ -1,0 +1,41 @@
+// xdv-core: runtime memory administration application
+
+forge XdvCoreMemoryApp {
+
+    const APP_ID: UInt32 = 4;
+    const DIAG_BLOCK_SIZE: UInt32 = 4096;
+    const ZERO_VALUE: UInt8 = 0;
+
+    proc K::memory_alloc(size: UInt32) {
+        emit "xdv-core.memory: alloc";
+        return alloc(size);
+    }
+
+    proc K::memory_zero_alloc(size: UInt32) {
+        emit "xdv-core.memory: zero alloc";
+        return zero_alloc(size);
+    }
+
+    proc K::memory_free(ptr: UInt64) {
+        emit "xdv-core.memory: free";
+        return free(ptr);
+    }
+
+    proc K::memory_copy(dest: UInt64, src: UInt64, size: UInt32) {
+        emit "xdv-core.memory: copy";
+        return copy(dest, src, size);
+    }
+
+    proc K::memory_set(ptr: UInt64, value: UInt8, size: UInt32) {
+        emit "xdv-core.memory: set";
+        return set(ptr, value, size);
+    }
+
+    proc K::memory_diag() {
+        emit "xdv-core.memory: diagnostic";
+        alloc(DIAG_BLOCK_SIZE);
+        set(0, ZERO_VALUE, DIAG_BLOCK_SIZE);
+        free(0);
+        return 0;
+    }
+}

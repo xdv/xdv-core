@@ -1,0 +1,48 @@
+// xdv-core: runtime administration orchestration application
+
+forge XdvCoreRuntimeAdmin {
+
+    const TOOL_CONSOLE: UInt32 = 1;
+    const TOOL_INIT: UInt32 = 2;
+    const TOOL_IO: UInt32 = 3;
+    const TOOL_MEMORY: UInt32 = 4;
+    const TOOL_PROCESS: UInt32 = 5;
+    const TOOL_SCHEDULER: UInt32 = 6;
+    const TOOL_STRING: UInt32 = 7;
+    const TOOL_SYSMON: UInt32 = 8;
+    const TOOL_SERVICE: UInt32 = 9;
+    const TOOL_LOG: UInt32 = 10;
+    const TOOL_STORAGE: UInt32 = 11;
+    const TOOL_SECURITY: UInt32 = 12;
+    const TOOL_RECOVERY: UInt32 = 13;
+
+    proc K::run_runtime_minimum_set() {
+        emit "xdv-core.runtime-admin: minimum set";
+        console_status();
+        init_status();
+        io_open_read(0);
+        memory_diag();
+        process_current_pid();
+        scheduler_status();
+        string_len(0);
+        return 0;
+    }
+
+    proc K::run_system_admin_set() {
+        emit "xdv-core.runtime-admin: system admin set";
+        sysmon_snapshot();
+        service_status();
+        log_status();
+        storage_status();
+        security_status();
+        recovery_diagnostics();
+        return 0;
+    }
+
+    proc K::run_full_admin_cycle() {
+        emit "xdv-core.runtime-admin: full admin cycle";
+        run_runtime_minimum_set();
+        run_system_admin_set();
+        return 0;
+    }
+}
