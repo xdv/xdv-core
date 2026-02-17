@@ -13,12 +13,10 @@ forge XdvCoreInitApp {
     const SIGNAL_RELOAD: UInt32 = 1;
 
     proc K::init_status() {
-        emit "xdv-core.init: status";
         return main();
     }
 
     proc K::init_bootstrap() {
-        emit "xdv-core.init: bootstrap";
         let console_status = init_console();
         if console_status == STATUS_OK {
             let scheduler_status = init_scheduler();
@@ -43,7 +41,6 @@ forge XdvCoreInitApp {
     }
 
     proc K::init_spawn_shell() {
-        emit "xdv-core.init: spawn shell";
         let status = spawn_shell();
         if status == STATUS_OK {
             return STATUS_OK;
@@ -53,7 +50,6 @@ forge XdvCoreInitApp {
     }
 
     proc K::init_wait(pid: UInt32) {
-        emit "xdv-core.init: wait";
         let status = wait_for_child(pid);
         if status == STATUS_OK {
             return STATUS_OK;
@@ -63,7 +59,6 @@ forge XdvCoreInitApp {
     }
 
     proc K::init_reap() {
-        emit "xdv-core.init: reap zombies";
         let status = reap_zombies();
         if status == STATUS_OK {
             return STATUS_OK;
@@ -73,7 +68,6 @@ forge XdvCoreInitApp {
     }
 
     proc K::init_shutdown() {
-        emit "xdv-core.init: shutdown signal";
         let status = handle_signal(SIGNAL_SHUTDOWN);
         if status == STATUS_OK {
             return STATUS_OK;
@@ -83,7 +77,6 @@ forge XdvCoreInitApp {
     }
 
     proc K::init_reload() {
-        emit "xdv-core.init: reload signal";
         let status = handle_signal(SIGNAL_RELOAD);
         if status == STATUS_OK {
             return STATUS_OK;

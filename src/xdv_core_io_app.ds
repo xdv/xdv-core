@@ -17,7 +17,6 @@ forge XdvCoreIoApp {
     const INVALID_FD: UInt64 = 0;
 
     proc K::io_open_read(path_ptr: UInt64) {
-        emit "xdv-core.io: open read";
         if path_ptr == 0 {
             return INVALID_FD;
         } else {
@@ -26,7 +25,6 @@ forge XdvCoreIoApp {
     }
 
     proc K::io_open_write(path_ptr: UInt64) {
-        emit "xdv-core.io: open write";
         if path_ptr == 0 {
             return INVALID_FD;
         } else {
@@ -35,7 +33,6 @@ forge XdvCoreIoApp {
     }
 
     proc K::io_open_append(path_ptr: UInt64) {
-        emit "xdv-core.io: open append";
         if path_ptr == 0 {
             return INVALID_FD;
         } else {
@@ -44,7 +41,6 @@ forge XdvCoreIoApp {
     }
 
     proc K::io_read(fd: UInt64, buffer: UInt64, size: UInt32) {
-        emit "xdv-core.io: read";
         if fd == INVALID_FD {
             return STATUS_INVALID_HANDLE;
         } else {
@@ -57,7 +53,6 @@ forge XdvCoreIoApp {
     }
 
     proc K::io_write(fd: UInt64, buffer: UInt64, size: UInt32) {
-        emit "xdv-core.io: write";
         if fd == INVALID_FD {
             return STATUS_INVALID_HANDLE;
         } else {
@@ -70,7 +65,6 @@ forge XdvCoreIoApp {
     }
 
     proc K::io_close(fd: UInt64) {
-        emit "xdv-core.io: close";
         if fd == INVALID_FD {
             return STATUS_INVALID_HANDLE;
         } else {

@@ -11,7 +11,6 @@ forge XdvCoreStorageApp {
     const DEFAULT_FILE_MODE: UInt16 = 420;
 
     proc K::storage_status() {
-        emit "xdv-core.storage: status";
         let probe = probe_all();
         if probe == STATUS_OK {
             let blk = lsblk();
@@ -26,42 +25,34 @@ forge XdvCoreStorageApp {
     }
 
     proc K::storage_partition_print(device: Str) {
-        emit "xdv-core.storage: partition print";
         return fdisk_print(device);
     }
 
     proc K::storage_mkfs(device: Str) {
-        emit "xdv-core.storage: mkfs";
         return mkfs_xdvfs(device);
     }
 
     proc K::storage_fsck(device: Str) {
-        emit "xdv-core.storage: fsck";
         return fsck_xdvfs(device, SAFE_REPAIR_MODE);
     }
 
     proc K::storage_mount(device: Str, mount_point: Str) {
-        emit "xdv-core.storage: mount";
         return mount_xdvfs(device, mount_point);
     }
 
     proc K::storage_unmount(mount_point: Str) {
-        emit "xdv-core.storage: unmount";
         return mount_umount(mount_point);
     }
 
     proc K::storage_df(device: Str, mount_point: Str) {
-        emit "xdv-core.storage: df";
         return space_df(device, mount_point);
     }
 
     proc K::storage_dir_list(path: Str) {
-        emit "xdv-core.storage: dir list";
         return dir_ls(path, 0);
     }
 
     proc K::storage_file_touch(path: Str) {
-        emit "xdv-core.storage: file touch";
         let touch_status = file_touch(path);
         if touch_status == STATUS_OK {
             let perm_status = perm_chmod(path, DEFAULT_FILE_MODE);

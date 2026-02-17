@@ -10,7 +10,6 @@ forge XdvCoreStringApp {
     const STATUS_OUT_OF_BOUNDS: UInt32 = 3;
 
     proc K::string_len(ptr: UInt64) {
-        emit "xdv-core.string: len";
         if ptr == 0 {
             return STATUS_INVALID_INPUT;
         } else {
@@ -19,7 +18,6 @@ forge XdvCoreStringApp {
     }
 
     proc K::string_concat(a: UInt64, b: UInt64) {
-        emit "xdv-core.string: concat";
         if a == 0 {
             if b == 0 {
                 return STATUS_INVALID_INPUT;
@@ -32,7 +30,6 @@ forge XdvCoreStringApp {
     }
 
     proc K::string_compare(a: UInt64, b: UInt64) {
-        emit "xdv-core.string: compare";
         if a == 0 {
             if b == 0 {
                 return STATUS_OK;
@@ -45,7 +42,6 @@ forge XdvCoreStringApp {
     }
 
     proc K::string_find(haystack: UInt64, needle: UInt64) {
-        emit "xdv-core.string: find";
         if haystack == 0 {
             return STATUS_INVALID_INPUT;
         } else {
@@ -58,7 +54,6 @@ forge XdvCoreStringApp {
     }
 
     proc K::string_substring(ptr: UInt64, start_idx: UInt32, end_idx: UInt32) {
-        emit "xdv-core.string: substring";
         if ptr == 0 {
             return STATUS_INVALID_INPUT;
         } else {
@@ -71,7 +66,6 @@ forge XdvCoreStringApp {
     }
 
     proc K::string_to_upper(ptr: UInt64) {
-        emit "xdv-core.string: to upper";
         if ptr == 0 {
             return STATUS_INVALID_INPUT;
         } else {
@@ -80,7 +74,6 @@ forge XdvCoreStringApp {
     }
 
     proc K::string_to_lower(ptr: UInt64) {
-        emit "xdv-core.string: to lower";
         if ptr == 0 {
             return STATUS_INVALID_INPUT;
         } else {

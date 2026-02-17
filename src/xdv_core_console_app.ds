@@ -16,7 +16,6 @@ forge XdvCoreConsoleApp {
     const MAX_COLS: UInt32 = 80;
 
     proc K::console_status() {
-        emit "xdv-core.console: status";
         let row = get_cursor_row();
         let col = get_cursor_col();
         if row < MAX_ROWS {
@@ -31,7 +30,6 @@ forge XdvCoreConsoleApp {
     }
 
     proc K::console_clear() {
-        emit "xdv-core.console: clear";
         let status = clear();
         if status == STATUS_OK {
             return STATUS_OK;
@@ -41,7 +39,6 @@ forge XdvCoreConsoleApp {
     }
 
     proc K::console_set_theme(fg: UInt8, bg: UInt8) {
-        emit "xdv-core.console: set theme";
         let theme_status = set_color(fg, bg);
         if theme_status == STATUS_OK {
             return STATUS_OK;
@@ -60,7 +57,6 @@ forge XdvCoreConsoleApp {
     }
 
     proc K::console_write(ptr: UInt64) {
-        emit "xdv-core.console: write";
         if ptr == 0 {
             return STATUS_INVALID_INPUT;
         } else {
@@ -74,7 +70,6 @@ forge XdvCoreConsoleApp {
     }
 
     proc K::console_read_key() {
-        emit "xdv-core.console: read key";
         let key = getchar();
         if key == 0 {
             return STATUS_CONSOLE_FAIL;
@@ -84,7 +79,6 @@ forge XdvCoreConsoleApp {
     }
 
     proc K::console_move_cursor(row: UInt32, col: UInt32) {
-        emit "xdv-core.console: move cursor";
         if row < MAX_ROWS {
             if col < MAX_COLS {
                 let status = set_cursor(row, col);

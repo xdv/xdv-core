@@ -23,7 +23,6 @@ forge XdvCoreRuntimeAdmin {
     const SAMPLE_PTR: UInt64 = 1;
 
     proc K::run_runtime_minimum_set() {
-        emit "xdv-core.runtime-admin: minimum set";
 
         let console_state = console_status();
         if console_state == STATUS_OK {
@@ -65,7 +64,6 @@ forge XdvCoreRuntimeAdmin {
     }
 
     proc K::run_system_admin_set() {
-        emit "xdv-core.runtime-admin: system admin set";
 
         let sysmon_state = sysmon_snapshot();
         if sysmon_state == STATUS_OK {
@@ -101,7 +99,6 @@ forge XdvCoreRuntimeAdmin {
     }
 
     proc K::run_full_admin_cycle() {
-        emit "xdv-core.runtime-admin: full admin cycle";
         let runtime_state = run_runtime_minimum_set();
         if runtime_state == STATUS_OK {
             let admin_state = run_system_admin_set();

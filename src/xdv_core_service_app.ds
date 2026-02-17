@@ -13,7 +13,6 @@ forge XdvCoreServiceApp {
     const INVALID_PID: UInt32 = 0;
 
     proc K::service_status() {
-        emit "xdv-core.service: status";
         let pid = process_current_pid();
         if pid == INVALID_PID {
             return STATUS_SERVICE_FAILED;
@@ -28,7 +27,6 @@ forge XdvCoreServiceApp {
     }
 
     proc K::service_start(entry: UInt64) {
-        emit "xdv-core.service: start";
         let pid = process_spawn_with_stack(entry, DEFAULT_STACK_SIZE);
         if pid == INVALID_PID {
             return STATUS_SERVICE_FAILED;
@@ -48,7 +46,6 @@ forge XdvCoreServiceApp {
     }
 
     proc K::service_start_priority(entry: UInt64, priority: UInt32) {
-        emit "xdv-core.service: start priority";
         let pid = process_spawn_with_stack(entry, DEFAULT_STACK_SIZE);
         if pid == INVALID_PID {
             return STATUS_SERVICE_FAILED;
@@ -68,7 +65,6 @@ forge XdvCoreServiceApp {
     }
 
     proc K::service_stop(pid: UInt32) {
-        emit "xdv-core.service: stop";
         if pid == INVALID_PID {
             return STATUS_INVALID_PID;
         } else {
@@ -87,7 +83,6 @@ forge XdvCoreServiceApp {
     }
 
     proc K::service_restart(pid: UInt32, entry: UInt64) {
-        emit "xdv-core.service: restart";
         let stop_status = service_stop(pid);
         if stop_status == STATUS_OK {
             return service_start(entry);
@@ -97,7 +92,6 @@ forge XdvCoreServiceApp {
     }
 
     proc K::service_reload() {
-        emit "xdv-core.service: reload";
         let reload_status = init_reload();
         if reload_status == STATUS_OK {
             return STATUS_OK;

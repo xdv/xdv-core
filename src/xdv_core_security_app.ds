@@ -14,7 +14,6 @@ forge XdvCoreSecurityApp {
     const MAX_MODE: UInt16 = 511;
 
     proc K::security_status() {
-        emit "xdv-core.security: status";
         let mask = perm_default_umask();
         let pid = process_current_pid();
         if pid == 0 {
@@ -29,7 +28,6 @@ forge XdvCoreSecurityApp {
     }
 
     proc K::security_chmod(path: Str, mode: UInt16) {
-        emit "xdv-core.security: chmod";
         if mode > MAX_MODE {
             return STATUS_INVALID_MODE;
         } else {
@@ -38,17 +36,14 @@ forge XdvCoreSecurityApp {
     }
 
     proc K::security_chown(path: Str, user_id: UInt32) {
-        emit "xdv-core.security: chown";
         return perm_chown(path, user_id);
     }
 
     proc K::security_chgrp(path: Str, group_id: UInt32) {
-        emit "xdv-core.security: chgrp";
         return perm_chgrp(path, group_id);
     }
 
     proc K::security_lockdown(path: Str) {
-        emit "xdv-core.security: lockdown";
         let status = perm_chmod(path, MODE_LOCKDOWN);
         if status == STATUS_OK {
             return STATUS_OK;
@@ -58,7 +53,6 @@ forge XdvCoreSecurityApp {
     }
 
     proc K::security_restore(path: Str) {
-        emit "xdv-core.security: restore";
         let chmod_status = perm_chmod(path, MODE_STANDARD);
         if chmod_status == STATUS_OK {
             let umask = perm_set_umask(DEFAULT_UMASK);

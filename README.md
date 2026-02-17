@@ -78,6 +78,11 @@ Permission and ownership administration.
 `src/xdv_core_recovery_app.ds`  
 Recovery and diagnostics.
 
+`src/xdv_core_command_profile.ds`  
+Command-oriented wrappers for each app (`console`, `init`, `io`, `memory`, `process`,
+`scheduler`, `strings`, `runtime-admin`, `sysmon`, `service`, `log`, `storage`,
+`security`, `recovery`, `cli`) mapped to runtime-relevant operations.
+
 ## Build
 
 ```bash

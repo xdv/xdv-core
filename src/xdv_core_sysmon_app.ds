@@ -12,7 +12,6 @@ forge XdvCoreSysmonApp {
     const SAMPLE_BUFFER_SIZE: UInt32 = 256;
 
     proc K::sysmon_snapshot() {
-        emit "xdv-core.sysmon: snapshot";
         let pid = process_current_pid();
         if pid == 0 {
             return STATUS_SYSMON_FAILED;
@@ -37,7 +36,6 @@ forge XdvCoreSysmonApp {
     }
 
     proc K::sysmon_runtime_health() {
-        emit "xdv-core.sysmon: runtime health";
         let init_state = init_status();
         if init_state == STATUS_OK {
             let tick = scheduler_tick();
@@ -57,7 +55,6 @@ forge XdvCoreSysmonApp {
     }
 
     proc K::sysmon_io_sample(path_ptr: UInt64, buffer_ptr: UInt64) {
-        emit "xdv-core.sysmon: io sample";
         let fd = io_open_read(path_ptr);
         if fd == 0 {
             return STATUS_IO_SAMPLE_FAILED;
@@ -77,7 +74,6 @@ forge XdvCoreSysmonApp {
     }
 
     proc K::sysmon_storage_sample(device: Str) {
-        emit "xdv-core.sysmon: storage sample";
         let ls = lsblk();
         if ls == STATUS_OK {
             let stat = space_iostat(device);

@@ -8,7 +8,6 @@ forge XdvCoreRecoveryApp {
     const STATUS_RECOVERY_FAILED: UInt32 = 1;
 
     proc K::recovery_diagnostics() {
-        emit "xdv-core.recovery: diagnostics";
         let sys = sysmon_snapshot();
         if sys == STATUS_OK {
             let svc = service_status();
@@ -33,7 +32,6 @@ forge XdvCoreRecoveryApp {
     }
 
     proc K::recovery_safe_mode(device: Str, mount_point: Str) {
-        emit "xdv-core.recovery: safe mode";
         let clear_state = console_clear();
         if clear_state == STATUS_OK {
             let ro_mount = mount_read_only(device, mount_point);
@@ -53,7 +51,6 @@ forge XdvCoreRecoveryApp {
     }
 
     proc K::recovery_repair(device: Str, mount_point: Str) {
-        emit "xdv-core.recovery: repair";
         let fsck = fsck_auto_repair(device);
         if fsck == STATUS_OK {
             let check = mount_check(device);
@@ -73,7 +70,6 @@ forge XdvCoreRecoveryApp {
     }
 
     proc K::recovery_reload_runtime() {
-        emit "xdv-core.recovery: reload runtime";
         let reload = init_reload();
         if reload == STATUS_OK {
             let sched = scheduler_init_start();
