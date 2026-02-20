@@ -83,6 +83,53 @@ Command-oriented wrappers for each app (`console`, `init`, `io`, `memory`, `proc
 `scheduler`, `strings`, `runtime-admin`, `sysmon`, `service`, `log`, `storage`,
 `security`, `recovery`, `cli`) mapped to runtime-relevant operations.
 
+## Next Core Applications
+
+`src/xdv_core_contract_app.ds`  
+Boot/runtime/shell contract validation.
+
+`src/xdv_core_boottrace_app.ds`  
+Boot timeline and loader trace controls.
+
+`src/xdv_core_preload_app.ds`  
+Preload package validation and sync.
+
+`src/xdv_core_xdvfs_app.ds`  
+xdvfs inspection and kernel-path verification.
+
+`src/xdv_core_task_app.ds`  
+Task lifecycle control (spawn/join/stop/cycle).
+
+`src/xdv_core_journal_app.ds`  
+Structured journal append/read/rotate controls.
+
+`src/xdv_core_audit_app.ds`  
+Audit stream capture and review.
+
+`src/xdv_core_policy_app.ds`  
+Runtime policy load/apply/reload controls.
+
+`src/xdv_core_keymap_app.ds`  
+US-layout keymap validation and keyboard diagnostics.
+
+`src/xdv_core_term_app.ds`  
+Terminal profile and prompt rendering controls.
+
+`src/xdv_core_diag_app.ds`  
+Unified runtime/storage/security diagnostics.
+
+`src/xdv_core_repair_app.ds`  
+Targeted repair workflows for runtime and storage.
+
+`src/xdv_core_pkg_app.ds`  
+Package verification/install/activation controls.
+
+`src/xdv_core_edxctl_app.ds`  
+EDX process registration and lifecycle controls.
+
+`src/xdv_core_snapshot_app.ds`  
+Runtime/state snapshot capture and restore controls.
+
 ## Build
 
 ```bash

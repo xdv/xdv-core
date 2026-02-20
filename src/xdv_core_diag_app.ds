@@ -1,0 +1,79 @@
+// xdv-core: unified runtime diagnostics application
+
+forge XdvCoreDiagApp {
+
+    const APP_ID: UInt32 = 31;
+
+    const STATUS_OK: UInt32 = 0;
+    const STATUS_DIAG_FAILED: UInt32 = 1;
+
+    proc K::diag_status() {
+        let runtime = run_runtime_minimum_set();
+        if runtime == STATUS_OK {
+            let sysmon = sysmon_snapshot();
+            if sysmon == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_DIAG_FAILED;
+            }
+        } else {
+            return STATUS_DIAG_FAILED;
+        }
+    }
+
+    proc K::diag_runtime() {
+        let health = sysmon_runtime_health();
+        if health == STATUS_OK {
+            let scheduler = scheduler_tick();
+            if scheduler == 3 {
+                return STATUS_DIAG_FAILED;
+            } else {
+                return STATUS_OK;
+            }
+        } else {
+            return STATUS_DIAG_FAILED;
+        }
+    }
+
+    proc K::diag_storage(device: Str, mount_point: Str) {
+        let storage = storage_status();
+        if storage == STATUS_OK {
+            let df = storage_df(device, mount_point);
+            if df == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_DIAG_FAILED;
+            }
+        } else {
+            return STATUS_DIAG_FAILED;
+        }
+    }
+
+    proc K::diag_security() {
+        let security = security_status();
+        if security == STATUS_OK {
+            let recovery = recovery_diagnostics();
+            if recovery == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_DIAG_FAILED;
+            }
+        } else {
+            return STATUS_DIAG_FAILED;
+        }
+    }
+
+    proc K::diag_full(device: Str, mount_point: Str) {
+        let runtime = diag_runtime();
+        if runtime == STATUS_OK {
+            let storage = diag_storage(device, mount_point);
+            if storage == STATUS_OK {
+                return diag_security();
+            } else {
+                return STATUS_DIAG_FAILED;
+            }
+        } else {
+            return STATUS_DIAG_FAILED;
+        }
+    }
+}

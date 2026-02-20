@@ -1,0 +1,86 @@
+// xdv-core: xdvfs inspection and verification application
+
+forge XdvCoreXdvFsApp {
+
+    const APP_ID: UInt32 = 24;
+
+    const STATUS_OK: UInt32 = 0;
+    const STATUS_XDVFS_FAILED: UInt32 = 1;
+    const STATUS_MOUNT_FAILED: UInt32 = 2;
+    const STATUS_KERNEL_MISSING: UInt32 = 3;
+
+    proc K::xdvfs_status(device: Str) {
+        let probe = probe_all();
+        if probe == STATUS_OK {
+            let io = space_iostat(device);
+            if io == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_XDVFS_FAILED;
+            }
+        } else {
+            return STATUS_XDVFS_FAILED;
+        }
+    }
+
+    proc K::xdvfs_mount_cycle(device: Str, mount_point: Str) {
+        let mounted = storage_mount(device, mount_point);
+        if mounted == STATUS_OK {
+            let listed = storage_dir_list(mount_point);
+            let unmounted = storage_unmount(mount_point);
+            if unmounted == STATUS_OK {
+                if listed == STATUS_OK {
+                    return STATUS_OK;
+                } else {
+                    return STATUS_XDVFS_FAILED;
+                }
+            } else {
+                return STATUS_MOUNT_FAILED;
+            }
+        } else {
+            return STATUS_MOUNT_FAILED;
+        }
+    }
+
+    proc K::xdvfs_verify_console_kernel(device: Str, mount_point: Str, kernel_path: Str) {
+        let mounted = storage_mount(device, mount_point);
+        if mounted == STATUS_OK {
+            let listed = storage_dir_list(kernel_path);
+            let unmounted = storage_unmount(mount_point);
+            if unmounted == STATUS_OK {
+                if listed == STATUS_OK {
+                    return STATUS_OK;
+                } else {
+                    return STATUS_KERNEL_MISSING;
+                }
+            } else {
+                return STATUS_MOUNT_FAILED;
+            }
+        } else {
+            return STATUS_MOUNT_FAILED;
+        }
+    }
+
+    proc K::xdvfs_space_report(device: Str, mount_point: Str) {
+        let df = storage_df(device, mount_point);
+        if df == STATUS_OK {
+            return STATUS_OK;
+        } else {
+            return STATUS_XDVFS_FAILED;
+        }
+    }
+
+    proc K::xdvfs_integrity(device: Str, mount_point: Str, kernel_path: Str) {
+        let fsck = storage_fsck(device);
+        if fsck == STATUS_OK {
+            let kernel = xdvfs_verify_console_kernel(device, mount_point, kernel_path);
+            if kernel == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_KERNEL_MISSING;
+            }
+        } else {
+            return STATUS_XDVFS_FAILED;
+        }
+    }
+}

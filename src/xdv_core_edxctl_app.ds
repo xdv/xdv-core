@@ -1,0 +1,123 @@
+// xdv-core: xdv-edx process and bridge control application
+
+forge XdvCoreEdxCtlApp {
+
+    const APP_ID: UInt32 = 34;
+
+    const STATUS_OK: UInt32 = 0;
+    const STATUS_EDXCTL_FAILED: UInt32 = 1;
+    const STATUS_INVALID_INPUT: UInt32 = 2;
+
+    const INVALID_PID: UInt32 = 0;
+    const DEFAULT_PRIORITY: UInt32 = 5;
+    const DEFAULT_STACK_SIZE: UInt32 = 8192;
+
+    proc K::edxctl_status(binary_path_ptr: UInt64) {
+        if binary_path_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let fd = io_open_read(binary_path_ptr);
+            if fd == 0 {
+                return STATUS_EDXCTL_FAILED;
+            } else {
+                let closed = io_close(fd);
+                if closed == STATUS_OK {
+                    let runtime = run_runtime_minimum_set();
+                    if runtime == STATUS_OK {
+                        return STATUS_OK;
+                    } else {
+                        return STATUS_EDXCTL_FAILED;
+                    }
+                } else {
+                    return STATUS_EDXCTL_FAILED;
+                }
+            }
+        }
+    }
+
+    proc K::edxctl_register(entry: UInt64, priority: UInt32) {
+        let pid = process_spawn_with_stack(entry, DEFAULT_STACK_SIZE);
+        if pid == INVALID_PID {
+            return STATUS_EDXCTL_FAILED;
+        } else {
+            let add = scheduler_add(pid);
+            if add == STATUS_OK {
+                let set_prio = scheduler_set_priority(pid, priority);
+                if set_prio == STATUS_OK {
+                    return pid;
+                } else {
+                    process_kill(pid);
+                    return STATUS_EDXCTL_FAILED;
+                }
+            } else {
+                process_kill(pid);
+                return STATUS_EDXCTL_FAILED;
+            }
+        }
+    }
+
+    proc K::edxctl_launch(binary_path_ptr: UInt64, entry: UInt64) {
+        let status = edxctl_status(binary_path_ptr);
+        if status == STATUS_OK {
+            let pid = edxctl_register(entry, DEFAULT_PRIORITY);
+            if pid > 0 {
+                let yielded = process_yield();
+                if yielded == STATUS_OK {
+                    return STATUS_OK;
+                } else {
+                    return STATUS_EDXCTL_FAILED;
+                }
+            } else {
+                return STATUS_EDXCTL_FAILED;
+            }
+        } else {
+            return STATUS_EDXCTL_FAILED;
+        }
+    }
+
+    proc K::edxctl_stop(pid: UInt32) {
+        if pid == INVALID_PID {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let removed = scheduler_remove(pid);
+            if removed == STATUS_OK {
+                let killed = process_kill(pid);
+                if killed == STATUS_OK {
+                    return STATUS_OK;
+                } else {
+                    return STATUS_EDXCTL_FAILED;
+                }
+            } else {
+                return STATUS_EDXCTL_FAILED;
+            }
+        }
+    }
+
+    proc K::edxctl_reload_bridge() {
+        let reload = init_reload();
+        if reload == STATUS_OK {
+            let services = service_reload();
+            if services == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_EDXCTL_FAILED;
+            }
+        } else {
+            return STATUS_EDXCTL_FAILED;
+        }
+    }
+
+    proc K::edxctl_self_test(binary_path_ptr: UInt64, entry: UInt64) {
+        let launch_state = edxctl_launch(binary_path_ptr, entry);
+        if launch_state == STATUS_OK {
+            let health = sysmon_runtime_health();
+            if health == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_EDXCTL_FAILED;
+            }
+        } else {
+            return STATUS_EDXCTL_FAILED;
+        }
+    }
+}

@@ -1,0 +1,120 @@
+// xdv-core: package presence, install, and activation application
+
+forge XdvCorePkgApp {
+
+    const APP_ID: UInt32 = 33;
+
+    const STATUS_OK: UInt32 = 0;
+    const STATUS_PKG_FAILED: UInt32 = 1;
+    const STATUS_INVALID_INPUT: UInt32 = 2;
+    const STATUS_PACKAGE_MISSING: UInt32 = 3;
+
+    const INVALID_FD: UInt64 = 0;
+
+    proc K::pkg_status(manifest_ptr: UInt64) {
+        if manifest_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let fd = io_open_read(manifest_ptr);
+            if fd == INVALID_FD {
+                return STATUS_PACKAGE_MISSING;
+            } else {
+                let closed = io_close(fd);
+                if closed == STATUS_OK {
+                    return STATUS_OK;
+                } else {
+                    return STATUS_PKG_FAILED;
+                }
+            }
+        }
+    }
+
+    proc K::pkg_verify(package_ptr: UInt64) {
+        if package_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let fd = io_open_read(package_ptr);
+            if fd == INVALID_FD {
+                return STATUS_PACKAGE_MISSING;
+            } else {
+                let closed = io_close(fd);
+                if closed == STATUS_OK {
+                    return STATUS_OK;
+                } else {
+                    return STATUS_PKG_FAILED;
+                }
+            }
+        }
+    }
+
+    proc K::pkg_install(package_ptr: UInt64, mount_path_ptr: UInt64, payload_ptr: UInt64, payload_size: UInt32) {
+        let available = pkg_verify(package_ptr);
+        if available == STATUS_OK {
+            let fd = io_open_write(mount_path_ptr);
+            if fd == INVALID_FD {
+                return STATUS_PKG_FAILED;
+            } else {
+                let written = io_write(fd, payload_ptr, payload_size);
+                let closed = io_close(fd);
+                if closed == STATUS_OK {
+                    if written == STATUS_OK {
+                        return STATUS_OK;
+                    } else {
+                        return STATUS_PKG_FAILED;
+                    }
+                } else {
+                    return STATUS_PKG_FAILED;
+                }
+            }
+        } else {
+            return STATUS_PACKAGE_MISSING;
+        }
+    }
+
+    proc K::pkg_activate() {
+        let reload = init_reload();
+        if reload == STATUS_OK {
+            let services = service_reload();
+            if services == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_PKG_FAILED;
+            }
+        } else {
+            return STATUS_PKG_FAILED;
+        }
+    }
+
+    proc K::pkg_list(path: Str) {
+        let listed = storage_dir_list(path);
+        if listed == STATUS_OK {
+            return STATUS_OK;
+        } else {
+            return STATUS_PKG_FAILED;
+        }
+    }
+
+    proc K::pkg_sync_core_set(os_ptr: UInt64, core_ptr: UInt64, edx_ptr: UInt64, shell_ptr: UInt64) {
+        let os = pkg_verify(os_ptr);
+        if os == STATUS_OK {
+            let core = pkg_verify(core_ptr);
+            if core == STATUS_OK {
+                let edx = pkg_verify(edx_ptr);
+                if edx == STATUS_OK {
+                    let shell = pkg_verify(shell_ptr);
+                    if shell == STATUS_OK {
+                        return pkg_activate();
+                    } else {
+                        return STATUS_PACKAGE_MISSING;
+                    }
+                } else {
+                    return STATUS_PACKAGE_MISSING;
+                }
+            } else {
+                return STATUS_PACKAGE_MISSING;
+            }
+        } else {
+            return STATUS_PACKAGE_MISSING;
+        }
+    }
+}

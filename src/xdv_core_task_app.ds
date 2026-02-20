@@ -1,0 +1,95 @@
+// xdv-core: runtime task lifecycle management application
+
+forge XdvCoreTaskApp {
+
+    const APP_ID: UInt32 = 25;
+
+    const STATUS_OK: UInt32 = 0;
+    const STATUS_TASK_FAILED: UInt32 = 1;
+    const STATUS_INVALID_PID: UInt32 = 2;
+    const STATUS_INVALID_PRIORITY: UInt32 = 3;
+
+    const INVALID_PID: UInt32 = 0;
+    const DEFAULT_STACK_SIZE: UInt32 = 8192;
+
+    proc K::task_status() {
+        let pid = process_current_pid();
+        if pid == INVALID_PID {
+            return STATUS_TASK_FAILED;
+        } else {
+            let scheduler = scheduler_status();
+            if scheduler == 3 {
+                return STATUS_TASK_FAILED;
+            } else {
+                return STATUS_OK;
+            }
+        }
+    }
+
+    proc K::task_spawn(entry: UInt64, priority: UInt32) {
+        let pid = process_spawn_with_stack(entry, DEFAULT_STACK_SIZE);
+        if pid == INVALID_PID {
+            return STATUS_TASK_FAILED;
+        } else {
+            let add_status = scheduler_add(pid);
+            if add_status == STATUS_OK {
+                let prio_status = scheduler_set_priority(pid, priority);
+                if prio_status == STATUS_OK {
+                    return pid;
+                } else {
+                    process_kill(pid);
+                    return STATUS_INVALID_PRIORITY;
+                }
+            } else {
+                process_kill(pid);
+                return STATUS_TASK_FAILED;
+            }
+        }
+    }
+
+    proc K::task_join(pid: UInt32) {
+        if pid == INVALID_PID {
+            return STATUS_INVALID_PID;
+        } else {
+            let joined = process_join(pid);
+            if joined == INVALID_PID {
+                return STATUS_TASK_FAILED;
+            } else {
+                return STATUS_OK;
+            }
+        }
+    }
+
+    proc K::task_stop(pid: UInt32) {
+        if pid == INVALID_PID {
+            return STATUS_INVALID_PID;
+        } else {
+            let removed = scheduler_remove(pid);
+            if removed == STATUS_OK {
+                let killed = process_kill(pid);
+                if killed == STATUS_OK {
+                    return STATUS_OK;
+                } else {
+                    return STATUS_TASK_FAILED;
+                }
+            } else {
+                return STATUS_TASK_FAILED;
+            }
+        }
+    }
+
+    proc K::task_cycle(entry: UInt64, priority: UInt32, duration_ms: UInt32) {
+        let spawned = task_spawn(entry, priority);
+        if spawned > 0 {
+            let slept = process_sleep(duration_ms);
+            if slept == STATUS_OK {
+                return task_stop(spawned);
+            } else {
+                task_stop(spawned);
+                return STATUS_TASK_FAILED;
+            }
+        } else {
+            return STATUS_TASK_FAILED;
+        }
+    }
+}

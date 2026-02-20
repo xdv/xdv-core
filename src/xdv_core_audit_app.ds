@@ -1,0 +1,78 @@
+// xdv-core: audit stream and security evidence application
+
+forge XdvCoreAuditApp {
+
+    const APP_ID: UInt32 = 27;
+
+    const STATUS_OK: UInt32 = 0;
+    const STATUS_AUDIT_FAILED: UInt32 = 1;
+    const STATUS_INVALID_INPUT: UInt32 = 2;
+
+    proc K::audit_status(audit_path_ptr: UInt64) {
+        let journal = journal_status(audit_path_ptr);
+        if journal == STATUS_OK {
+            let security = security_status();
+            if security == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_AUDIT_FAILED;
+            }
+        } else {
+            return STATUS_AUDIT_FAILED;
+        }
+    }
+
+    proc K::audit_record(audit_path_ptr: UInt64, event_ptr: UInt64, size: UInt32) {
+        if event_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let written = journal_append(audit_path_ptr, event_ptr, size);
+            if written == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_AUDIT_FAILED;
+            }
+        }
+    }
+
+    proc K::audit_review(audit_path_ptr: UInt64, buffer_ptr: UInt64, size: UInt32) {
+        let read_state = journal_read(audit_path_ptr, buffer_ptr, size);
+        if read_state == STATUS_OK {
+            return STATUS_OK;
+        } else {
+            return STATUS_AUDIT_FAILED;
+        }
+    }
+
+    proc K::audit_lockdown(path: Str) {
+        let status = security_lockdown(path);
+        if status == STATUS_OK {
+            return STATUS_OK;
+        } else {
+            return STATUS_AUDIT_FAILED;
+        }
+    }
+
+    proc K::audit_restore(path: Str) {
+        let status = security_restore(path);
+        if status == STATUS_OK {
+            return STATUS_OK;
+        } else {
+            return STATUS_AUDIT_FAILED;
+        }
+    }
+
+    proc K::audit_repair_cycle(device: Str, mount_point: Str, audit_path_ptr: UInt64, message_ptr: UInt64, size: UInt32) {
+        let diagnostics = recovery_diagnostics();
+        if diagnostics == STATUS_OK {
+            return audit_record(audit_path_ptr, message_ptr, size);
+        } else {
+            let repair = recovery_repair(device, mount_point);
+            if repair == STATUS_OK {
+                return audit_record(audit_path_ptr, message_ptr, size);
+            } else {
+                return STATUS_AUDIT_FAILED;
+            }
+        }
+    }
+}

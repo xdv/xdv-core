@@ -1,0 +1,86 @@
+// xdv-core: keyboard map and US-layout diagnostics application
+
+forge XdvCoreKeymapApp {
+
+    const APP_ID: UInt32 = 29;
+
+    const STATUS_OK: UInt32 = 0;
+    const STATUS_KEYMAP_FAILED: UInt32 = 1;
+    const STATUS_INVALID_INPUT: UInt32 = 2;
+    const STATUS_KEY_NOT_PRINTABLE: UInt32 = 3;
+
+    const ASCII_MIN: UInt32 = 32;
+    const ASCII_MAX: UInt32 = 126;
+    const KEY_COLON: UInt32 = 58;
+    const KEY_HASH: UInt32 = 35;
+    const KEY_SLASH: UInt32 = 47;
+    const KEY_DOT: UInt32 = 46;
+
+    proc K::keymap_status() {
+        let console = console_status();
+        if console == STATUS_OK {
+            let init_state = init_status();
+            if init_state == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_KEYMAP_FAILED;
+            }
+        } else {
+            return STATUS_KEYMAP_FAILED;
+        }
+    }
+
+    proc K::keymap_read_scancode() {
+        let key = console_read_key();
+        if key == 0 {
+            return STATUS_KEYMAP_FAILED;
+        } else {
+            return key;
+        }
+    }
+
+    proc K::keymap_is_us_printable(key: UInt32) {
+        if key < ASCII_MIN {
+            return STATUS_KEY_NOT_PRINTABLE;
+        } else {
+            if key > ASCII_MAX {
+                return STATUS_KEY_NOT_PRINTABLE;
+            } else {
+                return STATUS_OK;
+            }
+        }
+    }
+
+    proc K::keymap_validate_shell_chars() {
+        let colon = keymap_is_us_printable(KEY_COLON);
+        if colon == STATUS_OK {
+            let hash = keymap_is_us_printable(KEY_HASH);
+            if hash == STATUS_OK {
+                let slash = keymap_is_us_printable(KEY_SLASH);
+                if slash == STATUS_OK {
+                    return keymap_is_us_printable(KEY_DOT);
+                } else {
+                    return STATUS_KEYMAP_FAILED;
+                }
+            } else {
+                return STATUS_KEYMAP_FAILED;
+            }
+        } else {
+            return STATUS_KEYMAP_FAILED;
+        }
+    }
+
+    proc K::keymap_self_test() {
+        let layout = keymap_validate_shell_chars();
+        if layout == STATUS_OK {
+            let runtime = run_runtime_minimum_set();
+            if runtime == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_KEYMAP_FAILED;
+            }
+        } else {
+            return STATUS_KEYMAP_FAILED;
+        }
+    }
+}

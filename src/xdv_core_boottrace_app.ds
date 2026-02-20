@@ -1,0 +1,121 @@
+// xdv-core: boot timeline and loader trace application
+
+forge XdvCoreBoottraceApp {
+
+    const APP_ID: UInt32 = 22;
+
+    const STATUS_OK: UInt32 = 0;
+    const STATUS_BOOTTRACE_FAILED: UInt32 = 1;
+    const STATUS_INVALID_INPUT: UInt32 = 2;
+    const STATUS_INVALID_STAGE: UInt32 = 3;
+    const STATUS_INVALID_TICK: UInt32 = 4;
+
+    const BOOT_MODE_MBR: UInt32 = 1;
+    const BOOT_MODE_UEFI: UInt32 = 2;
+    const STAGE_MIN: UInt32 = 1;
+    const STAGE_MAX: UInt32 = 12;
+    const INVALID_FD: UInt64 = 0;
+
+    proc K::boottrace_status(trace_path_ptr: UInt64) {
+        if trace_path_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let status = log_status();
+            if status == STATUS_OK {
+                let fd = log_open(trace_path_ptr);
+                if fd == INVALID_FD {
+                    return STATUS_BOOTTRACE_FAILED;
+                } else {
+                    let closed = log_close(fd);
+                    if closed == STATUS_OK {
+                        return STATUS_OK;
+                    } else {
+                        return STATUS_BOOTTRACE_FAILED;
+                    }
+                }
+            } else {
+                return STATUS_BOOTTRACE_FAILED;
+            }
+        }
+    }
+
+    proc K::boottrace_detect_mode(mbr_probe: UInt32, uefi_probe: UInt32) {
+        if mbr_probe == STATUS_OK {
+            return BOOT_MODE_MBR;
+        } else {
+            if uefi_probe == STATUS_OK {
+                return BOOT_MODE_UEFI;
+            } else {
+                return STATUS_BOOTTRACE_FAILED;
+            }
+        }
+    }
+
+    proc K::boottrace_record_stage(trace_path_ptr: UInt64, message_ptr: UInt64, message_size: UInt32, stage: UInt32, ticks: UInt32) {
+        if stage < STAGE_MIN {
+            return STATUS_INVALID_STAGE;
+        } else {
+            if stage > STAGE_MAX {
+                return STATUS_INVALID_STAGE;
+            } else {
+                if ticks == 0 {
+                    return STATUS_INVALID_TICK;
+                } else {
+                    let fd = log_open(trace_path_ptr);
+                    if fd == INVALID_FD {
+                        return STATUS_BOOTTRACE_FAILED;
+                    } else {
+                        let written = log_write(fd, message_ptr, message_size);
+                        let closed = log_close(fd);
+                        if closed == STATUS_OK {
+                            if written == STATUS_OK {
+                                return STATUS_OK;
+                            } else {
+                                return STATUS_BOOTTRACE_FAILED;
+                            }
+                        } else {
+                            return STATUS_BOOTTRACE_FAILED;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    proc K::boottrace_validate_kernel_path(kernel_path_ptr: UInt64) {
+        if kernel_path_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let fd = io_open_read(kernel_path_ptr);
+            if fd == INVALID_FD {
+                return STATUS_BOOTTRACE_FAILED;
+            } else {
+                let closed = io_close(fd);
+                if closed == STATUS_OK {
+                    return STATUS_OK;
+                } else {
+                    return STATUS_BOOTTRACE_FAILED;
+                }
+            }
+        }
+    }
+
+    proc K::boottrace_summary(trace_path_ptr: UInt64, summary_ptr: UInt64, summary_size: UInt32, kernel_path_ptr: UInt64, mbr_probe: UInt32, uefi_probe: UInt32) {
+        let mode = boottrace_detect_mode(mbr_probe, uefi_probe);
+        if mode == STATUS_BOOTTRACE_FAILED {
+            return STATUS_BOOTTRACE_FAILED;
+        } else {
+            let kernel = boottrace_validate_kernel_path(kernel_path_ptr);
+            if kernel == STATUS_OK {
+                let stage = boottrace_record_stage(trace_path_ptr, summary_ptr, summary_size, 10, 1);
+                if stage == STATUS_OK {
+                    return STATUS_OK;
+                } else {
+                    return STATUS_BOOTTRACE_FAILED;
+                }
+            } else {
+                return STATUS_BOOTTRACE_FAILED;
+            }
+        }
+    }
+}

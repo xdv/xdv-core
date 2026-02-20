@@ -1,0 +1,108 @@
+// xdv-core: runtime/state snapshot capture and restore application
+
+forge XdvCoreSnapshotApp {
+
+    const APP_ID: UInt32 = 35;
+
+    const STATUS_OK: UInt32 = 0;
+    const STATUS_SNAPSHOT_FAILED: UInt32 = 1;
+    const STATUS_INVALID_INPUT: UInt32 = 2;
+
+    const INVALID_FD: UInt64 = 0;
+
+    proc K::snapshot_status(path_ptr: UInt64) {
+        if path_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let fd = io_open_append(path_ptr);
+            if fd == INVALID_FD {
+                return STATUS_SNAPSHOT_FAILED;
+            } else {
+                let closed = io_close(fd);
+                if closed == STATUS_OK {
+                    return STATUS_OK;
+                } else {
+                    return STATUS_SNAPSHOT_FAILED;
+                }
+            }
+        }
+    }
+
+    proc K::snapshot_capture(path_ptr: UInt64, buffer_ptr: UInt64, size: UInt32) {
+        if buffer_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let fd = io_open_append(path_ptr);
+            if fd == INVALID_FD {
+                return STATUS_SNAPSHOT_FAILED;
+            } else {
+                let written = io_write(fd, buffer_ptr, size);
+                let closed = io_close(fd);
+                if closed == STATUS_OK {
+                    if written == STATUS_OK {
+                        return STATUS_OK;
+                    } else {
+                        return STATUS_SNAPSHOT_FAILED;
+                    }
+                } else {
+                    return STATUS_SNAPSHOT_FAILED;
+                }
+            }
+        }
+    }
+
+    proc K::snapshot_restore(path_ptr: UInt64, buffer_ptr: UInt64, size: UInt32) {
+        if buffer_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let fd = io_open_read(path_ptr);
+            if fd == INVALID_FD {
+                return STATUS_SNAPSHOT_FAILED;
+            } else {
+                let read_state = io_read(fd, buffer_ptr, size);
+                let closed = io_close(fd);
+                if closed == STATUS_OK {
+                    if read_state == STATUS_OK {
+                        return STATUS_OK;
+                    } else {
+                        return STATUS_SNAPSHOT_FAILED;
+                    }
+                } else {
+                    return STATUS_SNAPSHOT_FAILED;
+                }
+            }
+        }
+    }
+
+    proc K::snapshot_capture_runtime(path_ptr: UInt64, buffer_ptr: UInt64, size: UInt32) {
+        let runtime = run_runtime_minimum_set();
+        if runtime == STATUS_OK {
+            return snapshot_capture(path_ptr, buffer_ptr, size);
+        } else {
+            return STATUS_SNAPSHOT_FAILED;
+        }
+    }
+
+    proc K::snapshot_capture_storage(path_ptr: UInt64, device: Str, mount_point: Str, buffer_ptr: UInt64, size: UInt32) {
+        let storage = storage_df(device, mount_point);
+        if storage == STATUS_OK {
+            return snapshot_capture(path_ptr, buffer_ptr, size);
+        } else {
+            return STATUS_SNAPSHOT_FAILED;
+        }
+    }
+
+    proc K::snapshot_full(path_ptr: UInt64, device: Str, mount_point: Str, buffer_ptr: UInt64, size: UInt32) {
+        let runtime = snapshot_capture_runtime(path_ptr, buffer_ptr, size);
+        if runtime == STATUS_OK {
+            let storage = snapshot_capture_storage(path_ptr, device, mount_point, buffer_ptr, size);
+            if storage == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_SNAPSHOT_FAILED;
+            }
+        } else {
+            return STATUS_SNAPSHOT_FAILED;
+        }
+    }
+}

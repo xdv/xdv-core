@@ -1,0 +1,108 @@
+// xdv-core: structured journal and log stream application
+
+forge XdvCoreJournalApp {
+
+    const APP_ID: UInt32 = 26;
+
+    const STATUS_OK: UInt32 = 0;
+    const STATUS_JOURNAL_FAILED: UInt32 = 1;
+    const STATUS_INVALID_INPUT: UInt32 = 2;
+
+    const INVALID_FD: UInt64 = 0;
+
+    proc K::journal_status(path_ptr: UInt64) {
+        if path_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let status = log_status();
+            if status == STATUS_OK {
+                let fd = log_open(path_ptr);
+                if fd == INVALID_FD {
+                    return STATUS_JOURNAL_FAILED;
+                } else {
+                    let closed = log_close(fd);
+                    if closed == STATUS_OK {
+                        return STATUS_OK;
+                    } else {
+                        return STATUS_JOURNAL_FAILED;
+                    }
+                }
+            } else {
+                return STATUS_JOURNAL_FAILED;
+            }
+        }
+    }
+
+    proc K::journal_append(path_ptr: UInt64, msg_ptr: UInt64, size: UInt32) {
+        if msg_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let fd = log_open(path_ptr);
+            if fd == INVALID_FD {
+                return STATUS_JOURNAL_FAILED;
+            } else {
+                let written = log_write(fd, msg_ptr, size);
+                let closed = log_close(fd);
+                if closed == STATUS_OK {
+                    if written == STATUS_OK {
+                        return STATUS_OK;
+                    } else {
+                        return STATUS_JOURNAL_FAILED;
+                    }
+                } else {
+                    return STATUS_JOURNAL_FAILED;
+                }
+            }
+        }
+    }
+
+    proc K::journal_read(path_ptr: UInt64, buffer_ptr: UInt64, size: UInt32) {
+        if buffer_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let fd = io_open_read(path_ptr);
+            if fd == INVALID_FD {
+                return STATUS_JOURNAL_FAILED;
+            } else {
+                let read_state = io_read(fd, buffer_ptr, size);
+                let closed = io_close(fd);
+                if closed == STATUS_OK {
+                    if read_state == STATUS_OK {
+                        return STATUS_OK;
+                    } else {
+                        return STATUS_JOURNAL_FAILED;
+                    }
+                } else {
+                    return STATUS_JOURNAL_FAILED;
+                }
+            }
+        }
+    }
+
+    proc K::journal_rotate(source_ptr: UInt64, target_ptr: UInt64, buffer_ptr: UInt64, size: UInt32) {
+        let read_status = journal_read(source_ptr, buffer_ptr, size);
+        if read_status == STATUS_OK {
+            let write_status = journal_append(target_ptr, buffer_ptr, size);
+            if write_status == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_JOURNAL_FAILED;
+            }
+        } else {
+            return STATUS_JOURNAL_FAILED;
+        }
+    }
+
+    proc K::journal_emit_console(msg_ptr: UInt64) {
+        if msg_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let emit_state = log_emit_console(msg_ptr);
+            if emit_state == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_JOURNAL_FAILED;
+            }
+        }
+    }
+}

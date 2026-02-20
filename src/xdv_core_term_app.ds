@@ -1,0 +1,83 @@
+// xdv-core: terminal rendering and interaction profile application
+
+forge XdvCoreTermApp {
+
+    const APP_ID: UInt32 = 30;
+
+    const STATUS_OK: UInt32 = 0;
+    const STATUS_TERM_FAILED: UInt32 = 1;
+    const STATUS_INVALID_INPUT: UInt32 = 2;
+
+    const DEFAULT_ROW: UInt32 = 0;
+    const DEFAULT_COL: UInt32 = 0;
+    const THEME_FG: UInt8 = 10;
+    const THEME_BG: UInt8 = 0;
+
+    proc K::term_status() {
+        let status = console_status();
+        if status == STATUS_OK {
+            return STATUS_OK;
+        } else {
+            return STATUS_TERM_FAILED;
+        }
+    }
+
+    proc K::term_clear_home() {
+        let cleared = console_clear();
+        if cleared == STATUS_OK {
+            let moved = console_move_cursor(DEFAULT_ROW, DEFAULT_COL);
+            if moved == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_TERM_FAILED;
+            }
+        } else {
+            return STATUS_TERM_FAILED;
+        }
+    }
+
+    proc K::term_set_theme(fg: UInt8, bg: UInt8) {
+        let set_state = console_set_theme(fg, bg);
+        if set_state == STATUS_OK {
+            return STATUS_OK;
+        } else {
+            return STATUS_TERM_FAILED;
+        }
+    }
+
+    proc K::term_write_prompt(prompt_ptr: UInt64, row: UInt32, col: UInt32) {
+        if prompt_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let moved = console_move_cursor(row, col);
+            if moved == STATUS_OK {
+                let written = console_write(prompt_ptr);
+                if written == STATUS_OK {
+                    return STATUS_OK;
+                } else {
+                    return STATUS_TERM_FAILED;
+                }
+            } else {
+                return STATUS_TERM_FAILED;
+            }
+        }
+    }
+
+    proc K::term_banner(title_ptr: UInt64) {
+        let theme = term_set_theme(THEME_FG, THEME_BG);
+        if theme == STATUS_OK {
+            return term_write_prompt(title_ptr, DEFAULT_ROW, DEFAULT_COL);
+        } else {
+            return STATUS_TERM_FAILED;
+        }
+    }
+
+    proc K::term_reset() {
+        let theme = console_reset_theme();
+        if theme == STATUS_OK {
+            return term_clear_home();
+        } else {
+            return STATUS_TERM_FAILED;
+        }
+    }
+}

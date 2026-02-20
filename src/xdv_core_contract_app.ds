@@ -1,0 +1,101 @@
+// xdv-core: boot/runtime/shell contract validation application
+
+forge XdvCoreContractApp {
+
+    const APP_ID: UInt32 = 21;
+
+    const STATUS_OK: UInt32 = 0;
+    const STATUS_CONTRACT_FAILED: UInt32 = 1;
+    const STATUS_INVALID_INPUT: UInt32 = 2;
+    const STATUS_CHAIN_BROKEN: UInt32 = 3;
+    const STATUS_RUNTIME_OFFLINE: UInt32 = 4;
+
+    const INVALID_FD: UInt64 = 0;
+
+    proc K::contract_status() {
+        let chain = contract_validate_chain();
+        if chain == STATUS_OK {
+            return contract_validate_runtime_surface();
+        } else {
+            return chain;
+        }
+    }
+
+    proc K::contract_validate_chain() {
+        let init_state = init_status();
+        if init_state == STATUS_OK {
+            let scheduler_state = scheduler_status();
+            if scheduler_state == 3 {
+                return STATUS_CHAIN_BROKEN;
+            } else {
+                let pid = process_current_pid();
+                if pid == 0 {
+                    return STATUS_CHAIN_BROKEN;
+                } else {
+                    return STATUS_OK;
+                }
+            }
+        } else {
+            return STATUS_CHAIN_BROKEN;
+        }
+    }
+
+    proc K::contract_validate_runtime_surface() {
+        let minimum = run_runtime_minimum_set();
+        if minimum == STATUS_OK {
+            let health = sysmon_runtime_health();
+            if health == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_RUNTIME_OFFLINE;
+            }
+        } else {
+            return STATUS_RUNTIME_OFFLINE;
+        }
+    }
+
+    proc K::contract_validate_kernel_path(kernel_path_ptr: UInt64) {
+        if kernel_path_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let fd = io_open_read(kernel_path_ptr);
+            if fd == INVALID_FD {
+                return STATUS_CONTRACT_FAILED;
+            } else {
+                let closed = io_close(fd);
+                if closed == STATUS_OK {
+                    return STATUS_OK;
+                } else {
+                    return STATUS_CONTRACT_FAILED;
+                }
+            }
+        }
+    }
+
+    proc K::contract_validate_chain_paths(boot_path_ptr: UInt64, kernel_path_ptr: UInt64, shell_path_ptr: UInt64) {
+        let boot_ok = contract_validate_kernel_path(boot_path_ptr);
+        if boot_ok == STATUS_OK {
+            let kernel_ok = contract_validate_kernel_path(kernel_path_ptr);
+            if kernel_ok == STATUS_OK {
+                return contract_validate_kernel_path(shell_path_ptr);
+            } else {
+                return STATUS_CONTRACT_FAILED;
+            }
+        } else {
+            return STATUS_CONTRACT_FAILED;
+        }
+    }
+
+    proc K::contract_report(message_ptr: UInt64) {
+        if message_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let shown = console_write(message_ptr);
+            if shown == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_CONTRACT_FAILED;
+            }
+        }
+    }
+}

@@ -1,0 +1,111 @@
+// xdv-core: runtime command and profile policy application
+
+forge XdvCorePolicyApp {
+
+    const APP_ID: UInt32 = 28;
+
+    const STATUS_OK: UInt32 = 0;
+    const STATUS_POLICY_FAILED: UInt32 = 1;
+    const STATUS_INVALID_INPUT: UInt32 = 2;
+
+    const PROFILE_MINIMUM: UInt32 = 1;
+    const PROFILE_ADMIN: UInt32 = 2;
+    const PROFILE_RECOVERY: UInt32 = 3;
+    const PROFILE_ALL: UInt32 = 4;
+    const POLICY_FILE_MODE: UInt16 = 384;
+
+    proc K::policy_status(policy_path_ptr: UInt64) {
+        if policy_path_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let fd = io_open_read(policy_path_ptr);
+            if fd == 0 {
+                return STATUS_POLICY_FAILED;
+            } else {
+                let closed = io_close(fd);
+                if closed == STATUS_OK {
+                    let security = security_status();
+                    if security == STATUS_OK {
+                        return STATUS_OK;
+                    } else {
+                        return STATUS_POLICY_FAILED;
+                    }
+                } else {
+                    return STATUS_POLICY_FAILED;
+                }
+            }
+        }
+    }
+
+    proc K::policy_load(policy_path_ptr: UInt64, buffer_ptr: UInt64, size: UInt32) {
+        if buffer_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let fd = io_open_read(policy_path_ptr);
+            if fd == 0 {
+                return STATUS_POLICY_FAILED;
+            } else {
+                let read_state = io_read(fd, buffer_ptr, size);
+                let closed = io_close(fd);
+                if closed == STATUS_OK {
+                    if read_state == STATUS_OK {
+                        return STATUS_OK;
+                    } else {
+                        return STATUS_POLICY_FAILED;
+                    }
+                } else {
+                    return STATUS_POLICY_FAILED;
+                }
+            }
+        }
+    }
+
+    proc K::policy_allow_command(policy_path: Str) {
+        let mode = security_chmod(policy_path, POLICY_FILE_MODE);
+        if mode == STATUS_OK {
+            return STATUS_OK;
+        } else {
+            return STATUS_POLICY_FAILED;
+        }
+    }
+
+    proc K::policy_deny_command(policy_path: Str) {
+        let locked = security_lockdown(policy_path);
+        if locked == STATUS_OK {
+            return STATUS_OK;
+        } else {
+            return STATUS_POLICY_FAILED;
+        }
+    }
+
+    proc K::policy_apply_profile(profile: UInt32, device: Str, mount_point: Str) {
+        if profile < PROFILE_MINIMUM {
+            return STATUS_INVALID_INPUT;
+        } else {
+            if profile > PROFILE_ALL {
+                return STATUS_INVALID_INPUT;
+            } else {
+                let run = run_profile(profile, device, mount_point);
+                if run == STATUS_OK {
+                    return STATUS_OK;
+                } else {
+                    return STATUS_POLICY_FAILED;
+                }
+            }
+        }
+    }
+
+    proc K::policy_reload_runtime() {
+        let reload = init_reload();
+        if reload == STATUS_OK {
+            let services = service_reload();
+            if services == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_POLICY_FAILED;
+            }
+        } else {
+            return STATUS_POLICY_FAILED;
+        }
+    }
+}

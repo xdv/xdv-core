@@ -1,0 +1,105 @@
+// xdv-core: preload package validation and synchronization application
+
+forge XdvCorePreloadApp {
+
+    const APP_ID: UInt32 = 23;
+
+    const STATUS_OK: UInt32 = 0;
+    const STATUS_PRELOAD_FAILED: UInt32 = 1;
+    const STATUS_INVALID_INPUT: UInt32 = 2;
+    const STATUS_PACKAGE_MISSING: UInt32 = 3;
+
+    const INVALID_FD: UInt64 = 0;
+
+    proc K::preload_manifest_status(manifest_path_ptr: UInt64) {
+        if manifest_path_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let fd = io_open_read(manifest_path_ptr);
+            if fd == INVALID_FD {
+                return STATUS_PRELOAD_FAILED;
+            } else {
+                let closed = io_close(fd);
+                if closed == STATUS_OK {
+                    return STATUS_OK;
+                } else {
+                    return STATUS_PRELOAD_FAILED;
+                }
+            }
+        }
+    }
+
+    proc K::preload_manifest_read(manifest_path_ptr: UInt64, buffer_ptr: UInt64, size: UInt32) {
+        if buffer_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let fd = io_open_read(manifest_path_ptr);
+            if fd == INVALID_FD {
+                return STATUS_PRELOAD_FAILED;
+            } else {
+                let read_state = io_read(fd, buffer_ptr, size);
+                let closed = io_close(fd);
+                if closed == STATUS_OK {
+                    if read_state == STATUS_OK {
+                        return STATUS_OK;
+                    } else {
+                        return STATUS_PRELOAD_FAILED;
+                    }
+                } else {
+                    return STATUS_PRELOAD_FAILED;
+                }
+            }
+        }
+    }
+
+    proc K::preload_verify_package(package_path_ptr: UInt64) {
+        if package_path_ptr == 0 {
+            return STATUS_INVALID_INPUT;
+        } else {
+            let fd = io_open_read(package_path_ptr);
+            if fd == INVALID_FD {
+                return STATUS_PACKAGE_MISSING;
+            } else {
+                let closed = io_close(fd);
+                if closed == STATUS_OK {
+                    return STATUS_OK;
+                } else {
+                    return STATUS_PRELOAD_FAILED;
+                }
+            }
+        }
+    }
+
+    proc K::preload_verify_core_set(os_ptr: UInt64, core_ptr: UInt64, edx_ptr: UInt64, shell_ptr: UInt64) {
+        let os_status = preload_verify_package(os_ptr);
+        if os_status == STATUS_OK {
+            let core_status = preload_verify_package(core_ptr);
+            if core_status == STATUS_OK {
+                let edx_status = preload_verify_package(edx_ptr);
+                if edx_status == STATUS_OK {
+                    return preload_verify_package(shell_ptr);
+                } else {
+                    return STATUS_PACKAGE_MISSING;
+                }
+            } else {
+                return STATUS_PACKAGE_MISSING;
+            }
+        } else {
+            return STATUS_PACKAGE_MISSING;
+        }
+    }
+
+    proc K::preload_sync_runtime(manifest_path_ptr: UInt64, buffer_ptr: UInt64, size: UInt32) {
+        let manifest = preload_manifest_read(manifest_path_ptr, buffer_ptr, size);
+        if manifest == STATUS_OK {
+            let runtime = run_runtime_minimum_set();
+            if runtime == STATUS_OK {
+                return STATUS_OK;
+            } else {
+                return STATUS_PRELOAD_FAILED;
+            }
+        } else {
+            return STATUS_PRELOAD_FAILED;
+        }
+    }
+}

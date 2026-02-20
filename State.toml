@@ -14,5 +14,6 @@ xdv_runtime = { path = "../xdv-runtime" }
 xdv_xdvfs_utils = { path = "../xdv-xdvfs-utils" }
 xdv_xdvfs = { path = "../xdv-xdvfs" }
 dustlib = { path = "../dustlib" }
-dustlib_k = { path = "../dustlib_k" }
-dust_runtime = { path = "../dust_runtime" }
+dustlib_k = { path = "../dustlib-k" }
+dust_runtime = { path = "../dust-runtime" }
+
