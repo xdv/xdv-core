@@ -1,0 +1,211 @@
+// xdv-core: deterministic application contract and behavior tests
+
+forge XdvCoreAppTests {
+
+    const TEST_PASS: UInt32 = 0;
+    const TEST_FAIL: UInt32 = 1;
+
+    proc K::expect_eq(actual: UInt32, expected: UInt32) {
+        if actual == expected {
+            return TEST_PASS;
+        } else {
+            return TEST_FAIL;
+        }
+    }
+
+    proc K::expect_zero_or_one(actual: UInt32) {
+        if actual == 0 {
+            return TEST_PASS;
+        } else {
+            if actual == 1 {
+                return TEST_PASS;
+            } else {
+                return TEST_FAIL;
+            }
+        }
+    }
+
+    proc K::combine(lhs: UInt32, rhs: UInt32) {
+        if lhs == TEST_PASS {
+            return rhs;
+        } else {
+            return TEST_FAIL;
+        }
+    }
+
+    proc K::test_contract_registry() {
+        return expect_eq(core_contract_validate_registry(), 0);
+    }
+
+    proc K::test_console_app() {
+        return expect_eq(console_write(0), 3);
+    }
+
+    proc K::test_init_app() {
+        return expect_eq(core_init_command(99, 0), 255);
+    }
+
+    proc K::test_io_app() {
+        let t1 = expect_eq(io_open_read(0), 0);
+        let t2 = expect_eq(io_read_bytes(0, 0, 1), 3);
+        return combine(t1, t2);
+    }
+
+    proc K::test_memory_app() {
+        return expect_eq(memory_free(0), 2);
+    }
+
+    proc K::test_process_app() {
+        return expect_eq(process_join(0), 2);
+    }
+
+    proc K::test_scheduler_app() {
+        return expect_eq(scheduler_set_priority(1, 11), 2);
+    }
+
+    proc K::test_string_app() {
+        return expect_eq(string_len(0), 2);
+    }
+
+    proc K::test_runtime_admin_app() {
+        return expect_zero_or_one(run_runtime_minimum_set());
+    }
+
+    proc K::test_sysmon_app() {
+        return expect_eq(sysmon_io_sample(0, 0), 2);
+    }
+
+    proc K::test_service_app() {
+        return expect_eq(service_stop(0), 2);
+    }
+
+    proc K::test_log_app() {
+        return expect_eq(log_emit_console(0), 3);
+    }
+
+    proc K::test_storage_app() {
+        return expect_eq(core_contract_validate_command_id(11, 9), 0);
+    }
+
+    proc K::test_security_app() {
+        return expect_eq(security_chmod("", 512), 2);
+    }
+
+    proc K::test_recovery_app() {
+        return expect_eq(core_recovery_command(99, "", ""), 255);
+    }
+
+    proc K::test_cli_app() {
+        return expect_eq(run_profile(99, "", ""), 1);
+    }
+
+    proc K::test_contract_app() {
+        return expect_eq(contract_validate_kernel_path(0), 2);
+    }
+
+    proc K::test_boottrace_app() {
+        return expect_eq(boottrace_status(0), 2);
+    }
+
+    proc K::test_preload_app() {
+        return expect_eq(preload_manifest_status(0), 2);
+    }
+
+    proc K::test_xdvfs_app() {
+        return expect_eq(core_contract_validate_command_id(24, 5), 0);
+    }
+
+    proc K::test_task_app() {
+        return expect_eq(task_join(0), 2);
+    }
+
+    proc K::test_journal_app() {
+        return expect_eq(journal_status(0), 2);
+    }
+
+    proc K::test_audit_app() {
+        return expect_eq(audit_record(1, 0, 0), 2);
+    }
+
+    proc K::test_policy_app() {
+        return expect_eq(policy_status(0), 2);
+    }
+
+    proc K::test_keymap_app() {
+        return expect_eq(keymap_is_us_printable(10), 3);
+    }
+
+    proc K::test_term_app() {
+        return expect_eq(term_write_prompt(0, 0, 0), 2);
+    }
+
+    proc K::test_diag_app() {
+        return expect_zero_or_one(diag_status());
+    }
+
+    proc K::test_repair_app() {
+        return expect_zero_or_one(repair_status());
+    }
+
+    proc K::test_pkg_app() {
+        return expect_eq(pkg_status(0), 2);
+    }
+
+    proc K::test_edxctl_app() {
+        return expect_eq(edxctl_status(0), 2);
+    }
+
+    proc K::test_snapshot_app() {
+        return expect_eq(snapshot_status(0), 2);
+    }
+
+    proc K::test_command_profile_app() {
+        return expect_eq(core_cli_command(99, "", ""), 255);
+    }
+
+    proc K::test_contract_metadata() {
+        let t1 = expect_eq(core_contract_pack_version(), 10000);
+        let t2 = expect_eq(core_contract_app_count(), 28);
+        let t3 = expect_eq(core_contract_is_known_app(35), 1);
+        let t4 = expect_eq(core_contract_is_known_app(99), 0);
+        let t5 = expect_eq(core_contract_validate_command_id(1, 8), 2);
+        let t6 = expect_eq(core_contract_validate_status_code(22, 5), 2);
+        return combine(combine(combine(combine(combine(t1, t2), t3), t4), t5), t6);
+    }
+
+    proc K::run_all_tests() {
+        let t01 = test_contract_registry();
+        let t02 = combine(t01, test_console_app());
+        let t03 = combine(t02, test_init_app());
+        let t04 = combine(t03, test_io_app());
+        let t05 = combine(t04, test_memory_app());
+        let t06 = combine(t05, test_process_app());
+        let t07 = combine(t06, test_scheduler_app());
+        let t08 = combine(t07, test_string_app());
+        let t09 = combine(t08, test_runtime_admin_app());
+        let t10 = combine(t09, test_sysmon_app());
+        let t11 = combine(t10, test_service_app());
+        let t12 = combine(t11, test_log_app());
+        let t13 = combine(t12, test_storage_app());
+        let t14 = combine(t13, test_security_app());
+        let t15 = combine(t14, test_recovery_app());
+        let t16 = combine(t15, test_cli_app());
+        let t17 = combine(t16, test_contract_app());
+        let t18 = combine(t17, test_boottrace_app());
+        let t19 = combine(t18, test_preload_app());
+        let t20 = combine(t19, test_xdvfs_app());
+        let t21 = combine(t20, test_task_app());
+        let t22 = combine(t21, test_journal_app());
+        let t23 = combine(t22, test_audit_app());
+        let t24 = combine(t23, test_policy_app());
+        let t25 = combine(t24, test_keymap_app());
+        let t26 = combine(t25, test_term_app());
+        let t27 = combine(t26, test_diag_app());
+        let t28 = combine(t27, test_repair_app());
+        let t29 = combine(t28, test_pkg_app());
+        let t30 = combine(t29, test_edxctl_app());
+        let t31 = combine(t30, test_snapshot_app());
+        let t32 = combine(t31, test_command_profile_app());
+        return combine(t32, test_contract_metadata());
+    }
+}

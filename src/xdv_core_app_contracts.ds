@@ -1,0 +1,338 @@
+// xdv-core: stable application contract registry and validators
+
+forge XdvCoreAppContracts {
+
+    const CONTRACT_OK: UInt32 = 0;
+    const CONTRACT_UNKNOWN_APP: UInt32 = 1;
+    const CONTRACT_OUT_OF_RANGE: UInt32 = 2;
+
+    const CONTRACT_VERSION_MAJOR: UInt32 = 1;
+    const CONTRACT_VERSION_MINOR: UInt32 = 0;
+    const CONTRACT_VERSION_PATCH: UInt32 = 0;
+
+    const APP_COUNT: UInt32 = 28;
+
+    const APP_CONSOLE: UInt32 = 1;
+    const APP_INIT: UInt32 = 2;
+    const APP_IO: UInt32 = 3;
+    const APP_MEMORY: UInt32 = 4;
+    const APP_PROCESS: UInt32 = 5;
+    const APP_SCHEDULER: UInt32 = 6;
+    const APP_STRING: UInt32 = 7;
+    const APP_SYSMON: UInt32 = 8;
+    const APP_SERVICE: UInt32 = 9;
+    const APP_LOG: UInt32 = 10;
+    const APP_STORAGE: UInt32 = 11;
+    const APP_SECURITY: UInt32 = 12;
+    const APP_RECOVERY: UInt32 = 13;
+    const APP_CONTRACT: UInt32 = 21;
+    const APP_BOOTTRACE: UInt32 = 22;
+    const APP_PRELOAD: UInt32 = 23;
+    const APP_XDVFS: UInt32 = 24;
+    const APP_TASK: UInt32 = 25;
+    const APP_JOURNAL: UInt32 = 26;
+    const APP_AUDIT: UInt32 = 27;
+    const APP_POLICY: UInt32 = 28;
+    const APP_KEYMAP: UInt32 = 29;
+    const APP_TERM: UInt32 = 30;
+    const APP_DIAG: UInt32 = 31;
+    const APP_REPAIR: UInt32 = 32;
+    const APP_PKG: UInt32 = 33;
+    const APP_EDXCTL: UInt32 = 34;
+    const APP_SNAPSHOT: UInt32 = 35;
+
+    proc K::core_contract_pack_version() {
+        return (CONTRACT_VERSION_MAJOR * 10000) + (CONTRACT_VERSION_MINOR * 100) + CONTRACT_VERSION_PATCH;
+    }
+
+    proc K::core_contract_app_count() {
+        return APP_COUNT;
+    }
+
+    proc K::core_contract_max_command_id(app_id: UInt32) {
+        if app_id == APP_CONSOLE {
+            return 7;
+        } else {
+            if app_id == APP_INIT {
+                return 7;
+            } else {
+                if app_id == APP_IO {
+                    return 6;
+                } else {
+                    if app_id == APP_MEMORY {
+                        return 6;
+                    } else {
+                        if app_id == APP_PROCESS {
+                            return 7;
+                        } else {
+                            if app_id == APP_SCHEDULER {
+                                return 7;
+                            } else {
+                                if app_id == APP_STRING {
+                                    return 7;
+                                } else {
+                                    if app_id == APP_SYSMON {
+                                        return 4;
+                                    } else {
+                                        if app_id == APP_SERVICE {
+                                            return 6;
+                                        } else {
+                                            if app_id == APP_LOG {
+                                                return 6;
+                                            } else {
+                                                if app_id == APP_STORAGE {
+                                                    return 9;
+                                                } else {
+                                                    if app_id == APP_SECURITY {
+                                                        return 6;
+                                                    } else {
+                                                        if app_id == APP_RECOVERY {
+                                                            return 4;
+                                                        } else {
+                                                            if app_id == APP_CONTRACT {
+                                                                return 6;
+                                                            } else {
+                                                                if app_id == APP_BOOTTRACE {
+                                                                    return 5;
+                                                                } else {
+                                                                    if app_id == APP_PRELOAD {
+                                                                        return 5;
+                                                                    } else {
+                                                                        if app_id == APP_XDVFS {
+                                                                            return 5;
+                                                                        } else {
+                                                                            if app_id == APP_TASK {
+                                                                                return 5;
+                                                                            } else {
+                                                                                if app_id == APP_JOURNAL {
+                                                                                    return 5;
+                                                                                } else {
+                                                                                    if app_id == APP_AUDIT {
+                                                                                        return 6;
+                                                                                    } else {
+                                                                                        if app_id == APP_POLICY {
+                                                                                            return 6;
+                                                                                        } else {
+                                                                                            if app_id == APP_KEYMAP {
+                                                                                                return 5;
+                                                                                            } else {
+                                                                                                if app_id == APP_TERM {
+                                                                                                    return 6;
+                                                                                                } else {
+                                                                                                    if app_id == APP_DIAG {
+                                                                                                        return 5;
+                                                                                                    } else {
+                                                                                                        if app_id == APP_REPAIR {
+                                                                                                            return 6;
+                                                                                                        } else {
+                                                                                                            if app_id == APP_PKG {
+                                                                                                                return 6;
+                                                                                                            } else {
+                                                                                                                if app_id == APP_EDXCTL {
+                                                                                                                    return 6;
+                                                                                                                } else {
+                                                                                                                    if app_id == APP_SNAPSHOT {
+                                                                                                                        return 6;
+                                                                                                                    } else {
+                                                                                                                        return 0;
+                                                                                                                    }
+                                                                                                                }
+                                                                                                            }
+                                                                                                        }
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    proc K::core_contract_max_status_code(app_id: UInt32) {
+        if app_id == APP_CONSOLE {
+            return 3;
+        } else {
+            if app_id == APP_INIT {
+                return 3;
+            } else {
+                if app_id == APP_IO {
+                    return 4;
+                } else {
+                    if app_id == APP_MEMORY {
+                        return 2;
+                    } else {
+                        if app_id == APP_PROCESS {
+                            return 2;
+                        } else {
+                            if app_id == APP_SCHEDULER {
+                                return 3;
+                            } else {
+                                if app_id == APP_STRING {
+                                    return 3;
+                                } else {
+                                    if app_id == APP_SYSMON {
+                                        return 3;
+                                    } else {
+                                        if app_id == APP_SERVICE {
+                                            return 2;
+                                        } else {
+                                            if app_id == APP_LOG {
+                                                return 3;
+                                            } else {
+                                                if app_id == APP_STORAGE {
+                                                    return 1;
+                                                } else {
+                                                    if app_id == APP_SECURITY {
+                                                        return 2;
+                                                    } else {
+                                                        if app_id == APP_RECOVERY {
+                                                            return 1;
+                                                        } else {
+                                                            if app_id == APP_CONTRACT {
+                                                                return 4;
+                                                            } else {
+                                                                if app_id == APP_BOOTTRACE {
+                                                                    return 4;
+                                                                } else {
+                                                                    if app_id == APP_PRELOAD {
+                                                                        return 3;
+                                                                    } else {
+                                                                        if app_id == APP_XDVFS {
+                                                                            return 3;
+                                                                        } else {
+                                                                            if app_id == APP_TASK {
+                                                                                return 3;
+                                                                            } else {
+                                                                                if app_id == APP_JOURNAL {
+                                                                                    return 2;
+                                                                                } else {
+                                                                                    if app_id == APP_AUDIT {
+                                                                                        return 2;
+                                                                                    } else {
+                                                                                        if app_id == APP_POLICY {
+                                                                                            return 2;
+                                                                                        } else {
+                                                                                            if app_id == APP_KEYMAP {
+                                                                                                return 3;
+                                                                                            } else {
+                                                                                                if app_id == APP_TERM {
+                                                                                                    return 2;
+                                                                                                } else {
+                                                                                                    if app_id == APP_DIAG {
+                                                                                                        return 1;
+                                                                                                    } else {
+                                                                                                        if app_id == APP_REPAIR {
+                                                                                                            return 1;
+                                                                                                        } else {
+                                                                                                            if app_id == APP_PKG {
+                                                                                                                return 3;
+                                                                                                            } else {
+                                                                                                                if app_id == APP_EDXCTL {
+                                                                                                                    return 2;
+                                                                                                                } else {
+                                                                                                                    if app_id == APP_SNAPSHOT {
+                                                                                                                        return 2;
+                                                                                                                    } else {
+                                                                                                                        return 0;
+                                                                                                                    }
+                                                                                                                }
+                                                                                                            }
+                                                                                                        }
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    proc K::core_contract_is_known_app(app_id: UInt32) {
+        if core_contract_max_command_id(app_id) == 0 {
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+
+    proc K::core_contract_validate_command_id(app_id: UInt32, command_id: UInt32) {
+        let max_cmd = core_contract_max_command_id(app_id);
+        if max_cmd == 0 {
+            return CONTRACT_UNKNOWN_APP;
+        } else {
+            if command_id == 0 {
+                return CONTRACT_OUT_OF_RANGE;
+            } else {
+                if command_id <= max_cmd {
+                    return CONTRACT_OK;
+                } else {
+                    return CONTRACT_OUT_OF_RANGE;
+                }
+            }
+        }
+    }
+
+    proc K::core_contract_validate_status_code(app_id: UInt32, status_code: UInt32) {
+        let max_status = core_contract_max_status_code(app_id);
+        if max_status == 0 {
+            return CONTRACT_UNKNOWN_APP;
+        } else {
+            if status_code <= max_status {
+                return CONTRACT_OK;
+            } else {
+                return CONTRACT_OUT_OF_RANGE;
+            }
+        }
+    }
+
+    proc K::core_contract_validate_registry() {
+        if core_contract_app_count() == APP_COUNT {
+            if core_contract_is_known_app(APP_CONSOLE) == 1 {
+                if core_contract_is_known_app(APP_SNAPSHOT) == 1 {
+                    return CONTRACT_OK;
+                } else {
+                    return CONTRACT_UNKNOWN_APP;
+                }
+            } else {
+                return CONTRACT_UNKNOWN_APP;
+            }
+        } else {
+            return CONTRACT_OUT_OF_RANGE;
+        }
+    }
+}
+
+

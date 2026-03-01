@@ -36,7 +36,7 @@ forge XdvCoreSnapshotApp {
             if fd == INVALID_FD {
                 return STATUS_SNAPSHOT_FAILED;
             } else {
-                let written = io_write(fd, buffer_ptr, size);
+                let written = io_write_bytes(fd, buffer_ptr, size);
                 let closed = io_close(fd);
                 if closed == STATUS_OK {
                     if written == STATUS_OK {
@@ -59,7 +59,7 @@ forge XdvCoreSnapshotApp {
             if fd == INVALID_FD {
                 return STATUS_SNAPSHOT_FAILED;
             } else {
-                let read_state = io_read(fd, buffer_ptr, size);
+                let read_state = io_read_bytes(fd, buffer_ptr, size);
                 let closed = io_close(fd);
                 if closed == STATUS_OK {
                     if read_state == STATUS_OK {
@@ -106,3 +106,4 @@ forge XdvCoreSnapshotApp {
         }
     }
 }
+

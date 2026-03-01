@@ -1,4 +1,4 @@
-﻿# XdvCoreProcessApp
+# XdvCoreProcessApp
 
 - Source: `xdv-core/src/xdv_core_process_app.ds`
 - App ID: `5`
@@ -31,12 +31,12 @@ xdv-core: runtime process administration application
 
 ## Runtime Dependencies
 - Detected runtime/API call usage:
-- `exit(...)`
-- `getpid(...)`
-- `join(...)`
-- `sleep(...)`
-- `spawn(...)`
-- `yield(...)`
+- `exit_process(...)`
+- `get_pid(...)`
+- `join_process(...)`
+- `sleep_process(...)`
+- `spawn_process(...)`
+- `yield_process(...)`
 
 ## Integration Notes
 - This module is documented as an application-level component intended for terminal/console workflows.
@@ -45,10 +45,12 @@ xdv-core: runtime process administration application
 
 ## Example (DPL)
 ```dust
-let status = process_spawn();
+let status = process_spawn(1);
 if status == STATUS_OK {
     emit "ok";
 } else {
     emit "failed";
 }
 ```
+
+

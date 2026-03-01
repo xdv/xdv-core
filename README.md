@@ -60,6 +60,12 @@ String utility administration.
 `src/xdv_core_runtime_admin.ds`  
 Runtime administration orchestration.
 
+`src/xdv_core_app_contracts.ds`  
+Stable app contracts (IDs, command ranges, status ranges) for all xdv-core apps.
+
+`src/xdv_core_app_tests.ds`  
+Deterministic per-application behavior tests and contract validation.
+
 `src/xdv_core_sysmon_app.ds`  
 Runtime telemetry and health.
 
@@ -131,6 +137,14 @@ EDX process registration and lifecycle controls.
 Runtime/state snapshot capture and restore controls.
 
 ## Build
+
+```bash
+dust check xdv-core/src
+```
+
+## Test Suite
+
+`xdv_core_app_tests` provides deterministic checks per application using invalid-input and contract-boundary assertions.
 
 ```bash
 dust check xdv-core/src

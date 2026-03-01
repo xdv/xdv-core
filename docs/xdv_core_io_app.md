@@ -1,4 +1,4 @@
-﻿# XdvCoreIoApp
+# XdvCoreIoApp
 
 - Source: `xdv-core/src/xdv_core_io_app.ds`
 - App ID: `3`
@@ -13,8 +13,8 @@ xdv-core: runtime I/O administration application
 | `io_open_read` | `path_ptr: UInt64` | Performs io open read operation. |
 | `io_open_write` | `path_ptr: UInt64` | Performs io open write operation. |
 | `io_open_append` | `path_ptr: UInt64` | Performs io open append operation. |
-| `io_read` | `fd: UInt64, buffer: UInt64, size: UInt32` | Performs io read operation. |
-| `io_write` | `fd: UInt64, buffer: UInt64, size: UInt32` | Performs io write operation. |
+| `io_read_bytes` | `fd: UInt64, buffer: UInt64, size: UInt32` | Performs io read operation. |
+| `io_write_bytes` | `fd: UInt64, buffer: UInt64, size: UInt32` | Performs io write operation. |
 | `io_close` | `fd: UInt64` | Performs io close operation. |
 
 ## Status And Result Codes
@@ -33,10 +33,10 @@ xdv-core: runtime I/O administration application
 
 ## Runtime Dependencies
 - Detected runtime/API call usage:
-- `close(...)`
-- `open(...)`
-- `read(...)`
-- `write(...)`
+- `close_file(...)`
+- `open_file(...)`
+- `read_file(...)`
+- `write_file(...)`
 
 ## Integration Notes
 - This module is documented as an application-level component intended for terminal/console workflows.
@@ -52,3 +52,4 @@ if status == STATUS_OK {
     emit "failed";
 }
 ```
+

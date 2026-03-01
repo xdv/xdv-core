@@ -45,7 +45,7 @@ forge XdvCorePolicyApp {
             if fd == 0 {
                 return STATUS_POLICY_FAILED;
             } else {
-                let read_state = io_read(fd, buffer_ptr, size);
+                let read_state = io_read_bytes(fd, buffer_ptr, size);
                 let closed = io_close(fd);
                 if closed == STATUS_OK {
                     if read_state == STATUS_OK {
@@ -109,3 +109,4 @@ forge XdvCorePolicyApp {
         }
     }
 }
+

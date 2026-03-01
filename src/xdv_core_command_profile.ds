@@ -210,10 +210,10 @@ forge XdvCoreCommandProfile {
                     }
                 } else {
                     if command == CMD_IO_READ {
-                        return io_read(fd, buffer, size);
+                        return io_read_bytes(fd, buffer, size);
                     } else {
                         if command == CMD_IO_WRITE {
-                            return io_write(fd, buffer, size);
+                            return io_write_bytes(fd, buffer, size);
                         } else {
                             if command == CMD_IO_CLOSE {
                                 return io_close(fd);
@@ -629,3 +629,4 @@ forge XdvCoreCommandProfile {
         }
     }
 }
+

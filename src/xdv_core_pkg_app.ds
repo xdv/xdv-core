@@ -54,7 +54,7 @@ forge XdvCorePkgApp {
             if fd == INVALID_FD {
                 return STATUS_PKG_FAILED;
             } else {
-                let written = io_write(fd, payload_ptr, payload_size);
+                let written = io_write_bytes(fd, payload_ptr, payload_size);
                 let closed = io_close(fd);
                 if closed == STATUS_OK {
                     if written == STATUS_OK {
@@ -118,3 +118,4 @@ forge XdvCorePkgApp {
         }
     }
 }
+

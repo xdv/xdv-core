@@ -1,4 +1,4 @@
-﻿# XdvCoreMemoryApp
+# XdvCoreMemoryApp
 
 - Source: `xdv-core/src/xdv_core_memory_app.ds`
 - App ID: `4`
@@ -30,10 +30,10 @@ xdv-core: runtime memory administration application
 
 ## Runtime Dependencies
 - Detected runtime/API call usage:
-- `alloc(...)`
-- `copy(...)`
-- `free(...)`
-- `set(...)`
+- `alloc_mem(...)`
+- `copy_mem(...)`
+- `free_mem(...)`
+- `set_mem(...)`
 - `zero_alloc(...)`
 
 ## Integration Notes
@@ -50,3 +50,4 @@ if status == STATUS_OK {
     emit "failed";
 }
 ```
+

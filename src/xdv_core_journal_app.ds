@@ -64,7 +64,7 @@ forge XdvCoreJournalApp {
             if fd == INVALID_FD {
                 return STATUS_JOURNAL_FAILED;
             } else {
-                let read_state = io_read(fd, buffer_ptr, size);
+                let read_state = io_read_bytes(fd, buffer_ptr, size);
                 let closed = io_close(fd);
                 if closed == STATUS_OK {
                     if read_state == STATUS_OK {
@@ -106,3 +106,4 @@ forge XdvCoreJournalApp {
         }
     }
 }
+

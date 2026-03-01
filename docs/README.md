@@ -1,4 +1,4 @@
-﻿# xdv-core Application Documentation
+# xdv-core Application Documentation
 
 This directory contains markdown documentation for each application module in `xdv-core/src`.
 
@@ -34,7 +34,13 @@ This directory contains markdown documentation for each application module in `x
 | `xdv_core_task_app.ds` | `XdvCoreTaskApp` | 5 | xdv-core: runtime task lifecycle management application |
 | `xdv_core_term_app.ds` | `XdvCoreTermApp` | 6 | xdv-core: terminal rendering and interaction profile application |
 | `xdv_core_xdvfs_app.ds` | `XdvCoreXdvFsApp` | 5 | xdv-core: xdvfs inspection and verification application |
+| `xdv_core_app_contracts.ds` | `XdvCoreAppContracts` | 8 | xdv-core: stable application contract registry and validators |
+| `xdv_core_app_tests.ds` | `XdvCoreAppTests` | 35 | xdv-core: deterministic application contract and behavior tests |
 
 ## Notes
 - Generated from source signatures/constants in `xdv-core/src`.
 - Update docs after app API changes to keep signatures and status codes in sync.
+
+
+
+
